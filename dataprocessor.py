@@ -83,6 +83,19 @@ class DataProcessor:
                 self.processed_columns.add(column)
             f.close()
 
+    @classmethod
+    def write_data(cls, date, daily_df, org_structure, outputpath, name):
+        if org_structure is not FileOrgStructure.DATECOLUMN:
+            raise Exception("Method not implemented")
+
+        with h5py.File(outputpath + r"/" + name + r"/" + date + ".hdf5", 'w') as f:
+            for column in daily_df.columns:
+                try:
+                    f.create_dataset(column, data=daily_df[column].to_numpy())
+                except:
+                    f.create_dataset(column, data=daily_df[column].to_numpy().astype(np.float64))
+            f.close()
+
     def process_halt_date(self):
         halt_date = self.referenceData["HaltDate"].copy()
         halt_date["restart_inclusive"] = halt_date.apply(lambda x: x["restart_time"] > 93000, axis=1)
