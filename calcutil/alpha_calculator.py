@@ -1,4 +1,4 @@
-from alphautil.alpha_calc_config import calc_start, calc_end, universe_options, pool_size
+from calcutil.alpha_calc_config import calc_start, calc_end, universe_options, pool_size
 from data.dataloader import DataLoader
 import alpha
 import logging

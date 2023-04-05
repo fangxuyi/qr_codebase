@@ -1,4 +1,4 @@
-from alphautil.alpha_calc_config import calc_start, calc_end
+from calcutil.alpha_calc_config import calc_start, calc_end
 from data.dataloader import DataLoader
 from data.dataprocessor import DataProcessor
 from data.rawdataloader import RawDataLoader

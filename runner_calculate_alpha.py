@@ -1,5 +1,5 @@
-from alphautil.alpha_calc_config import calc_start, calc_end, alpha_calculator_cfg_dict
-from alphautil.alpha_calculator import AlphaCalculator
+from calcutil.alpha_calc_config import calc_start, calc_end, alpha_calculator_cfg_dict
+from calcutil.alpha_calculator import AlphaCalculator
 from data.dataloader import DataLoader
 from data.rawdataloader import RawDataLoader
 import logging

@@ -1,5 +1,5 @@
-from alphautil.alpha_calc_config import alpha_perfmc_cfg_list
-from alphautil.alpha_performance_evaluator import PerformanceEvaluator
+from calcutil.alpha_calc_config import alpha_perfmc_cfg_list
+from calcutil.alpha_performance_evaluator import PerformanceEvaluator
 from data.rawdataloader import RawDataLoader
 import logging
 
