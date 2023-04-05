@@ -1,5 +1,5 @@
 from logging import handlers
-from settings import *
+from data.raw_data_loader_settings import *
 import h5py
 import logging
 import numpy as np
@@ -84,11 +84,11 @@ class DataProcessor:
             f.close()
 
     @classmethod
-    def write_data(cls, date, daily_df, org_structure, outputpath, name):
+    def write_alpha_data(cls, date, daily_df, name, org_structure=FileOrgStructure.DATECOLUMN):
         if org_structure is not FileOrgStructure.DATECOLUMN:
             raise Exception("Method not implemented")
 
-        with h5py.File(outputpath + r"/" + name + r"/" + date + ".hdf5", 'w') as f:
+        with h5py.File(AlphaOutputPath + r"/" + name + r"/" + date + ".hdf5", 'w') as f:
             for column in daily_df.columns:
                 try:
                     f.create_dataset(column, data=daily_df[column].to_numpy())

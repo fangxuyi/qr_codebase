@@ -1,4 +1,4 @@
-from settings import OutputDataPath
+from raw_data_loader_settings import OutputDataPath, AlphaOutputPath
 import h5py
 import logging
 import pandas as pd
@@ -16,6 +16,26 @@ class DataLoader:
         trade_date = trade_date[(trade_date["is_open"] == 1)]["date"].tolist()
         trade_date = sorted(trade_date)
         return trade_date
+
+    def load_processed_alpha(self, name, fields=None):
+        output = []
+        all_trade_dates = self.get_all_trade_dates()
+
+        for date in all_trade_dates:
+            try:
+                with h5py.File(AlphaOutputPath + r"/" + name + r"/" + date + ".hdf5", 'r') as f:
+                    curfiles = []
+                    if fields is None:
+                        fields = list(f)
+                    for field in fields:
+                        curfiles.append(pd.Series(f[field][:]).rename(field))
+                    f.close()
+                output.append(pd.concat(curfiles).assign(date=date))
+            except:
+                logger.info(f"skipping loading on {date}")
+                pass
+
+        return pd.concat(output).reset_index(drop=True)
 
     def load_processed(self, date, name, window, fields=None):
         output = []
@@ -64,6 +84,7 @@ class DataLoader:
     def get_adjustment_factor(self, date):
         current_cumulative_adjustment_factor = self.reference_data["CumulativeAdjustmentFactor"]
         current_cumulative_adjustment_factor = \
-        current_cumulative_adjustment_factor[current_cumulative_adjustment_factor["path"].apply(lambda x: date in x)][
-            "code"].tolist()
+            current_cumulative_adjustment_factor[
+                current_cumulative_adjustment_factor["path"].apply(lambda x: date in x)][
+                "code"].tolist()
         return current_cumulative_adjustment_factor

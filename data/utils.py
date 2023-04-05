@@ -1,4 +1,4 @@
-from settings import *
+from data.raw_data_loader_settings import *
 import dask.dataframe as dd
 import glob
 import logging
