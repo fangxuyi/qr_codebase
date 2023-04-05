@@ -41,31 +41,6 @@ class DataProcessor:
         self.write_data(date, processed_daily_pv, self.org_structure)
         logger.debug(f"wrote data in {time.perf_counter() - t} seconds")
 
-    def load_processed(self, date, window, fields=None):
-        output = []
-        with h5py.File(self.outputpath, 'r') as f:
-            dates = self.referenceData["Calendar"][["date", "is_open"]].astype(int)
-            dates = dates[dates["is_open"] == 1]["date"].astype(str).values.tolist()
-            dates = sorted(dates)
-            index = dates.index(date)
-            count = 0
-            while count < window:
-                curfiles = []
-                curdate = dates[index + count]
-                try:
-                    curfile = f[curdate]
-                    if fields is None:
-                        fields = list(curfile)
-                    for field in fields:
-                        curfiles.append(pd.Series(curfile[field][:]).rename(field))
-                    output.append(pd.concat(curfiles, axis=1))
-                except:
-                    logger.info(f"skipping loading on {curdate}")
-                    pass
-                count += 1
-            f.close()
-        return pd.concat(output).reset_index(drop=True)
-
     """ Helper Functions """
 
     def write_data(self, date, daily_df, org_structure):
@@ -81,6 +56,19 @@ class DataProcessor:
                     dategroup.create_dataset(column, data=daily_df[column].to_numpy().astype(np.float64))
                     logger.info(f"forced conversion on {date} for {column}")
                 self.processed_columns.add(column)
+            f.close()
+
+    @classmethod
+    def write_performance_data(cls, name, performance_df, org_structure=FileOrgStructure.DATECOLUMN):
+        if org_structure is not FileOrgStructure.DATECOLUMN:
+            raise Exception("Method not implemented")
+
+        with h5py.File(PerformanceOutputPath + r"/" + name + ".hdf5", 'w') as f:
+            for column in performance_df.columns:
+                try:
+                    f.create_dataset(column, data=performance_df[column].to_numpy())
+                except:
+                    f.create_dataset(column, data=performance_df[column].to_numpy().astype(np.float64))
             f.close()
 
     @classmethod

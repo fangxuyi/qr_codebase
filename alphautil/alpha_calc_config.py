@@ -1,3 +1,5 @@
+pool_size = 16
+
 calc_start = "20180101"
 calc_end = "20201231"
 

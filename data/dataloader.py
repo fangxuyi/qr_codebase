@@ -37,6 +37,24 @@ class DataLoader:
 
         return pd.concat(output).reset_index(drop=True)
 
+    def load_processed(self, name, window_list, fields=None):
+        output = []
+        with h5py.File(OutputDataPath + "\\" + name + ".hdf5", 'r') as f:
+            for curdate in window_list:
+                curfiles = []
+                try:
+                    curfile = f[curdate]
+                    if fields is None:
+                        fields = list(curfile)
+                    for field in fields:
+                        curfiles.append(pd.Series(curfile[field][:]).rename(field))
+                    output.append(pd.concat(curfiles, axis=1).assign(date=curdate))
+                except:
+                    logger.info(f"skipping loading on {curdate}")
+                    pass
+            f.close()
+        return pd.concat(output).reset_index(drop=True)
+
     def load_processed(self, date, name, window, fields=None):
         output = []
         with h5py.File(OutputDataPath + "\\" + name + ".hdf5", 'r') as f:

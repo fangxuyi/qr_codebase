@@ -12,6 +12,7 @@ PVDataPath = DataPath
 OutputDataPath = DataPath + r"\processed"
 WARNING_LOGFILE = r"logging\warning_logging_{}.txt"
 AlphaOutputPath = DataPath + r"\alpha"
+PerformanceOutputPath = DataPath + r"\performance"
 
 
 def standard_pv_data_processor(pv_data):

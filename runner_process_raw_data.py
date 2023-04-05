@@ -1,4 +1,4 @@
-from alpha.alpha_calc_config import calc_start, calc_end
+from alphautil.alpha_calc_config import calc_start, calc_end
 from data.dataloader import DataLoader
 from data.dataprocessor import DataProcessor
 from data.rawdataloader import RawDataLoader
@@ -20,6 +20,7 @@ if __name__ == '__main__':
         logger.info(f"processing {date}...")
         dataProcessor.process(standard_pv_data_processor, date)
 
-    # load raw data
-    # data = dataProcessor.load_processed("20180112", 5)
+    # load processed
+    dataLoader = DataLoader(referenceData)
+    dataLoader.load_processed("20181210", version, 5)
 

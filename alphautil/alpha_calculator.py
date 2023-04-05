@@ -1,4 +1,4 @@
-from alpha.alpha_calc_config import calc_start, calc_end, universe_options
+from alphautil.alpha_calc_config import calc_start, calc_end, universe_options, pool_size
 from data.dataloader import DataLoader
 import alpha
 import logging
@@ -38,7 +38,7 @@ class AlphaCalculator:
             class_ = getattr(module, class_name)
             instance = class_(alpha_name, universe, reference_data, **parameters)
 
-            pool = multiprocessing.Pool(16)
+            pool = multiprocessing.Pool(pool_size)
             pool.map(instance.calculate, trade_dates)
             pool.close()
             logger.info(f"calculated alpha in {time.perf_counter() - t} seconds")
