@@ -9,9 +9,10 @@ if __name__ == '__main__':
 
     logger = logging.getLogger(__name__)
     logging.basicConfig(level=logging.INFO)
-    dates = DataLoader.get_trade_date_between(calc_start, calc_end)
 
     reference_data = RawDataLoader.load_all_reference_data()
+    data_loader = DataLoader(reference_data)
+    dates = data_loader.get_trade_date_between(calc_start, calc_end)
 
-    AlphaCalculator.alpha_calc(alpha_calculator_cfg_dict, reference_data)
+    AlphaCalculator.alpha_calc(alpha_calculator_cfg_dict, reference_data, data_loader)
 

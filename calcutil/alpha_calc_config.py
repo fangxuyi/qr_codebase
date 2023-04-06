@@ -9,8 +9,8 @@ universe_options = [
 
 alpha_calculator_cfg_dict = {
     "alpha_algo_1": {
-        "classname": "TestCalc.TestAlphaCalc",
-        "universe": "HZ999",
+        "classname": "TestAlpha.TestAlphaCalc",
+        "universe": "ZZ9999",
         "parameters": {
             "params1": 1,
             "params2": 1,

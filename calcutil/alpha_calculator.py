@@ -1,6 +1,4 @@
 from calcutil.alpha_calc_config import calc_start, calc_end, universe_options, pool_size
-from data.dataloader import DataLoader
-import alpha
 import logging
 import multiprocessing
 import time
@@ -22,10 +20,10 @@ class AlphaCalculator:
             assert value[cls.universe_string] in universe_options, f"[universe] is required to be one of {universe_options} while input is {value[cls.universe_string]}"
 
     @classmethod
-    def alpha_calc(cls, cfg_dict, reference_data):
+    def alpha_calc(cls, cfg_dict, reference_data, data_loader):
 
         cls.validate_config(cfg_dict)
-        trade_dates = DataLoader.get_trade_date_between(reference_data, int(calc_start), int(calc_end))
+        trade_dates = data_loader.get_trade_date_between(calc_start, calc_end)
 
         for key, value in cfg_dict.items():
             t = time.perf_counter()
@@ -34,9 +32,11 @@ class AlphaCalculator:
             universe = value[cls.universe_string]
             parameters = value[cls.parameters_string]
 
-            module = __import__(alpha)
-            class_ = getattr(module, class_name)
-            instance = class_(alpha_name, universe, reference_data, **parameters)
+            cls_names = class_name.split(".")
+            class_ = getattr(__import__("alpha." + cls_names[0]), cls_names[0])
+            for ele in cls_names[1:]:
+                class_ = getattr(class_, ele)
+            instance = class_(alpha_name, universe, reference_data, parameters)
 
             pool = multiprocessing.Pool(pool_size)
             pool.map(instance.calculate, trade_dates)
