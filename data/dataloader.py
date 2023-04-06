@@ -77,6 +77,27 @@ class DataLoader:
             f.close()
         return pd.concat(output).reset_index(drop=True)
 
+    def get_halt_date(self):
+
+        halt_date = self.referenceData["HaltDate"].copy()
+        halt_date["restart_inclusive"] = halt_date.apply(lambda x: x["restart_time"] > 93000, axis=1)
+        trade_date = self.referenceData["Calendar"].copy()
+        trade_date = trade_date[trade_date["is_open"] == 1]
+
+        output = []
+        for row in halt_date.iterrows():
+            code = row[1]["code"]
+            halt_start = row[1]["halt_date"]
+            restart_date = row[1]["restart_date"]
+            if row[1]["restart_inclusive"]:
+                tmp = trade_date[(trade_date["date"] >= halt_start) & (trade_date["date"] <= restart_date)].assign(
+                    code=code).assign(is_halt=1)
+            else:
+                tmp = trade_date[(trade_date["date"] >= halt_start) & (trade_date["date"] < restart_date)].assign(
+                    code=code).assign(is_halt=1)
+            output.append(tmp[["code", "date", "is_halt"]])
+        return pd.concat(output)
+
     def get_trade_date_between(self, calc_start, calc_end):
         trade_date = self.referenceData["Calendar"][["date", "is_open"]].astype(int)
         trade_date = trade_date[(trade_date["is_open"] == 1) & (trade_date["date"] >= int(calc_start)) & (
