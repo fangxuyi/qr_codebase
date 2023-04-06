@@ -2,10 +2,7 @@ from pathlib import Path
 from enum import Enum
 
 
-version = "pv_1min_standard"
-
-
-BASE_DIR = str(Path(__file__).resolve().parent.parent)
+BASE_DIR = str(Path(__file__).resolve().parent.parent.parent)
 DataPath = BASE_DIR + r"\Data"
 ReferenceDataPath = DataPath + r"\other"
 PVDataPath = DataPath

@@ -1,4 +1,4 @@
-from raw_data_loader_settings import OutputDataPath, AlphaOutputPath
+from .raw_data_loader_settings import OutputDataPath, AlphaOutputPath
 import h5py
 import logging
 import pandas as pd
@@ -37,11 +37,12 @@ class DataLoader:
 
         return pd.concat(output).reset_index(drop=True)
 
-    def load_processed(self, name, window_list, fields=None):
+    def load_processed_window_list(self, name, window_list, fields=None):
         output = []
         with h5py.File(OutputDataPath + "\\" + name + ".hdf5", 'r') as f:
             for curdate in window_list:
                 curfiles = []
+                curdate = str(curdate)
                 try:
                     curfile = f[curdate]
                     if fields is None:

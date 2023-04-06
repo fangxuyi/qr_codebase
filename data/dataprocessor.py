@@ -6,9 +6,7 @@ import numpy as np
 import pandas as pd
 import time
 
-fh = handlers.RotatingFileHandler(WARNING_LOGFILE.format(version), maxBytes=(1048576 * 5), backupCount=7)
 logger = logging.getLogger(__name__)
-logger.addHandler(fh)
 
 
 class DataProcessor:

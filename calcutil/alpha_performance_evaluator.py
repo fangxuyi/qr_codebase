@@ -38,7 +38,7 @@ class PerformanceEvaluator:
         trade_dates = self.data_loader.get_trade_date_between(calc_start, calc_end)
         alpha = self.data_loader.load_processed_alpha(alpha_name)
         halt_adj_alpha = self.adjust_halt(alpha)
-        returns = self.dataloader.load_processed("1min_PV_return", trade_dates)
+        returns = self.dataloader.load_processed_window_list("pv_1min_return", trade_dates)
         merged_return = pd.merge(halt_adj_alpha, returns, left_on=["code", "date"], right_on=["code", "date"],
                                  how="left")
         merged_return["contributed_return"] = merged_return["return"] * merged_return["weight"]

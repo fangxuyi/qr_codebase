@@ -14,6 +14,8 @@ if __name__ == '__main__':
 
     referenceData = RawDataLoader.load_all_reference_data()
 
+    version = "pv_1min_standard"
+
     # process raw data
     dataProcessor = DataProcessor(version, referenceData, RawDataLoader)
     for date in dates:
