@@ -1,6 +1,6 @@
-# example
+# notes
 
-#### referenceData = RawDataLoader.load_all_reference_data()
-#### dataProcessor = DataProcessor(name, referenceData, RawDataLoader)
-#### case 1: dataProcessor.process(pv_data_processor, date, pv_data="1min_PV") -> data_processor
-#### case 2: dataProcessor.load_processed(date, window, fields=None) -> data_loader
+#### convert 1min data to daily: runner_process_raw_data.py
+#### produce daily return: runner_produce_daily_return.py
+#### calculate alpha: runner_calculate_alpha.py
+#### evaluate alpha: runner_evaluate_alpha.py
