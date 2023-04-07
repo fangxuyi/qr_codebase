@@ -41,6 +41,6 @@ class AlphaCalculator:
             pool = multiprocessing.Pool(pool_size)
             pool.map(instance.calculate, trade_dates)
             pool.close()
-            logger.info(f"calculated alpha in {time.perf_counter() - t} seconds")
+            logger.info(f"calculated {alpha_name} in {time.perf_counter() - t} seconds")
 
         logger.info("done calculating all alpha.")
