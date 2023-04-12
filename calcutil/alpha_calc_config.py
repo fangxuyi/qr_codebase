@@ -1,6 +1,6 @@
 pool_size = 16
 
-calc_start = "20180101"
+calc_start = "20180201"
 calc_end = "20201231"
 
 universe_options = [
@@ -12,8 +12,7 @@ alpha_calculator_cfg_dict = {
         "classname": "TestAlpha.TestAlphaCalc",
         "universe": "ZZ9999",
         "parameters": {
-            "params1": 1,
-            "params2": 1,
+            "lookback": 21,
         }
     }
 }

@@ -14,10 +14,23 @@ class TestAlphaCalc:
 
     def calculate(self, date):
         trade_dates = self.data_loader.get_all_trade_dates()
-        current_universe = self.data_loader.get_current_universe(self, date, self.universe)
-        adj_factor = self.data_loader.get_adjustment_factor(date, 5, trade_dates)
-        prices = self.dataloader.load_processed(date, "1min_PV", 5, trade_dates)
+        universe = self.data_loader.get_current_universe(date, self.universe)["code"].to_list()
+        try:
+            idx = trade_dates.index(date)
+            returns = self.data_loader.load_processed_window_list("pv_1min_return",
+                                                                  trade_dates[idx - self.parameter["lookback"]:idx + 1])
+            returns["code"] = returns["code"].apply(lambda x: x.decode('utf-8'))
+            returns = returns.pivot_table(index="date", columns="code", values="return")
+            returns = returns.reindex(universe, axis=1).dropna(how="any", axis=1)
 
-        result = pd.DataFrame()
-        print(f"calculating {self.name} with parameter {self.parameter} for {date}")
-        DataProcessor.write_alpha_data(date, result, self.alpha_name + "_" + self.universe)
+            total_return = (returns + 1).prod() - 1
+            total_return_avg = total_return.mean()
+            total_return_sum = total_return.apply(lambda x: abs(x)).sum() / 2
+            weight = (total_return - total_return_avg) / total_return_sum
+            weight = pd.DataFrame(weight.rename("weight"))
+            weight["date"] = date
+            weight = weight.reset_index()
+            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name + "_" + self.universe)
+
+        except:
+            pass

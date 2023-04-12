@@ -1,4 +1,4 @@
-from logging import handlers
+import os
 from data.raw_data_loader_settings import *
 import h5py
 import logging
@@ -74,7 +74,10 @@ class DataProcessor:
         if org_structure is not FileOrgStructure.DATECOLUMN:
             raise Exception("Method not implemented")
 
-        with h5py.File(AlphaOutputPath + r"/" + name + r"/" + date + ".hdf5", 'w') as f:
+        directory = AlphaOutputPath + "\\" + name
+        if not os.path.exists(directory):
+            os.mkdir(directory)
+        with h5py.File(directory + "\\" + date + ".hdf5", 'w') as f:
             for column in daily_df.columns:
                 try:
                     f.create_dataset(column, data=daily_df[column].to_numpy())

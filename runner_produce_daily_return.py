@@ -19,9 +19,9 @@ if __name__ == '__main__':
     processed_daily = dataLoader.load_processed_window_list("pv_1min_standard", all_dates_to_process, ["code", "close", "cum_adjf"])
 
     # calculate 1min return
-    processed_daily = processed_daily.pivot_table(index="date", columns="code", values="close")
+    processed_daily_return = processed_daily.pivot_table(index="date", columns="code", values="close")
     processed_daily_adjf = processed_daily.pivot_table(index="date", columns="code", values="cum_adjf")
-    processed_daily = processed_daily * processed_daily_adjf
+    processed_daily = processed_daily_return * processed_daily_adjf
     processed_daily = processed_daily.diff() / processed_daily.shift()
     processed_daily = processed_daily.unstack().rename("return").reset_index().dropna()
 
@@ -30,5 +30,6 @@ if __name__ == '__main__':
     for date in dates:
         daily_df = processed_daily[processed_daily["date"] == date]
         dataProcessor.write_data(date, daily_df, FileOrgStructure.DATECOLUMN)
+        logger.info(f"writing return data on {date}")
 
-    processed_daily_return = dataLoader.load_processed_window_list("pv_1min_return", all_dates_to_process)
+    # processed_daily_return = dataLoader.load_processed_window_list("pv_1min_return", all_dates_to_process)

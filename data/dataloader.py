@@ -64,6 +64,7 @@ class DataLoader:
             while count < window:
                 curfiles = []
                 curdate = self.trade_dates[index + count]
+                curdate = str(curdate)
                 try:
                     curfile = f[curdate]
                     if fields is None:
@@ -107,14 +108,14 @@ class DataLoader:
         return trade_date
 
     def get_current_universe(self, date, universe):
-        current_universe = self.reference_data[universe]
-        current_universe = current_universe[current_universe["path"].apply(lambda x: date in x)]["code"].tolist()
-        return current_universe
+        current_universe = self.referenceData[universe]
+        current_universe = current_universe[current_universe["path"].apply(lambda x: str(date) in x)]["code"]
+        return pd.DataFrame(current_universe)
 
-    def get_adjustment_factor(self, date, window):
+    def get_adjustment_factor_window(self, date, window):
         output = []
         i = self.trade_dates.index(date)
-        for idx in range(i, window):
+        for idx in range(i, i + window):
             date = self.trade_dates[idx]
             tmp = self.get_adjustment_factor(date)
             tmp["date"] = date
@@ -122,9 +123,9 @@ class DataLoader:
         return pd.concat(output)
 
     def get_adjustment_factor(self, date):
-        current_cumulative_adjustment_factor = self.reference_data["CumulativeAdjustmentFactor"]
+        current_cumulative_adjustment_factor = self.referenceData["CumulativeAdjustmentFactor"]
         current_cumulative_adjustment_factor = \
             current_cumulative_adjustment_factor[
-                current_cumulative_adjustment_factor["path"].apply(lambda x: date in x)][
-                "code"].tolist()
-        return current_cumulative_adjustment_factor
+                current_cumulative_adjustment_factor["path"].apply(lambda x: str(date) in x)][
+                "code"]
+        return pd.DataFrame(current_cumulative_adjustment_factor)
