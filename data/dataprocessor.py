@@ -61,7 +61,7 @@ class DataProcessor:
         if org_structure is not FileOrgStructure.DATECOLUMN:
             raise Exception("Method not implemented")
 
-        with h5py.File(PerformanceOutputPath + r"/" + name + ".hdf5", 'w') as f:
+        with h5py.File(PerformanceOutputPath + "\\" + name + ".hdf5", 'w') as f:
             for column in performance_df.columns:
                 try:
                     f.create_dataset(column, data=performance_df[column].to_numpy())

@@ -26,7 +26,7 @@ class TestAlphaCalc:
             total_return = (returns + 1).prod() - 1
             total_return_avg = total_return.mean()
             total_return_sum = total_return.apply(lambda x: abs(x)).sum() / 2
-            weight = (total_return - total_return_avg) / total_return_sum
+            weight = - (total_return - total_return_avg) / total_return_sum
             weight = pd.DataFrame(weight.rename("weight"))
             weight["date"] = date
             weight = weight.reset_index()

@@ -17,4 +17,4 @@ alpha_calculator_cfg_dict = {
     }
 }
 
-alpha_perfmc_cfg_list = ["alpha_algo_1"]
+alpha_perfmc_cfg_list = ["alpha_algo_1_ZZ9999"]

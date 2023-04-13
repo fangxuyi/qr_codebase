@@ -23,14 +23,14 @@ class DataLoader:
 
         for date in all_trade_dates:
             try:
-                with h5py.File(AlphaOutputPath + r"/" + name + r"/" + date + ".hdf5", 'r') as f:
+                with h5py.File(AlphaOutputPath + "\\" + name + "\\" + str(date) + ".hdf5", 'r') as f:
                     curfiles = []
                     if fields is None:
                         fields = list(f)
                     for field in fields:
                         curfiles.append(pd.Series(f[field][:]).rename(field))
                     f.close()
-                output.append(pd.concat(curfiles).assign(date=date))
+                output.append(pd.concat(curfiles, axis=1))
             except:
                 logger.info(f"skipping loading on {date}")
                 pass
