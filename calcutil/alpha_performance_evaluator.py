@@ -72,6 +72,8 @@ class PerformanceEvaluator:
 
         qs.reports.html(return_series["contributed_return"], output=True,
                         download_filename=TearSheetOutputPath + f"\\{alpha_name}.html")
+
+        # TODO: add html output for other metrics
         other_metrics = pd.concat([turnover(merged_return).rename("turnover"),
                                    longside_return(merged_return).rename("longside_return"),
                                    shortside_return(merged_return).rename("shortside_return")], axis=1)

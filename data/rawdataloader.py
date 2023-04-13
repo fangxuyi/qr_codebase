@@ -4,6 +4,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+#TODO: separate out raw data loader, update reference data loader to api
+
 def yyyymmdd_file_to_date(x):
     return int(x.split(r"\\")[-1].replace(".csv", ""))
 

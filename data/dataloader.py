@@ -5,6 +5,7 @@ import pandas as pd
 
 logger = logging.getLogger(__name__)
 
+# TODO: add cache to data loader
 
 class DataLoader:
     def __init__(self, referenceData):

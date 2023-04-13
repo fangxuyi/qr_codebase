@@ -9,6 +9,8 @@ import time
 logger = logging.getLogger(__name__)
 
 
+# TODO: process all files to standard format
+
 class DataProcessor:
 
     def __init__(self, name, referenceData, RawDataLoader, org_structure=FileOrgStructure.DATECOLUMN):
