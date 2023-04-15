@@ -38,6 +38,7 @@ class PerformanceEvaluator:
     def evaluate(self, alpha_list):
         pool = multiprocessing.Pool(pool_size)
         pool.map(self.evaluate_single_alpha, alpha_list)
+        # TODO: add alpha uniqueness
         pool.close()
 
     def adjust_halt(self, alpha):
@@ -56,6 +57,7 @@ class PerformanceEvaluator:
         halt_adj_alpha = self.adjust_halt(alpha).rename("weight").reset_index()
 
         # delay 1: getting weight eod day T, trade in T+1, get return T+2
+        # TODO: change halt adjust halt to T+1
         delay_1_alpha = halt_adj_alpha.pivot_table(index="date", columns="code", values="weight").shift(2)
         delay_1_alpha = delay_1_alpha.stack().rename("weight").reset_index()
 
