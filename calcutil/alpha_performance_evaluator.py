@@ -9,7 +9,7 @@ import pandas as pd
 import quantstats as qs
 import time
 
-from data.raw_data_loader_settings import TearSheetOutputPath, OtherPerfOutputPath
+from data.raw_data_loader_settings import TearSheetOutputPath, OtherPerfOutputPath, DataPath
 
 logger = logging.getLogger(__name__)
 qs.extend_pandas()
@@ -40,7 +40,7 @@ class PerformanceEvaluator:
         pool = multiprocessing.Pool(pool_size)
         all_returns = pool.map(self.evaluate_single_alpha, alpha_list)
         print("***** correlation matrix *****")
-        print(pd.concat(all_returns, axis=1).corr())
+        pd.concat(all_returns, axis=1).corr().to_csv(DataPath + "\\" + "correlation.csv")
         pool.close()
 
     def adjust_halt(self, alpha):
