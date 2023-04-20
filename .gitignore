@@ -1,5 +1,7 @@
 logging/
 venv/
+alpha/
+calcutil/alpha_calc_config.py
 
 .idea/
 __pycache__/

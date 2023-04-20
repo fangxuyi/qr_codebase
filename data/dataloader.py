@@ -18,11 +18,10 @@ class DataLoader:
         trade_date = sorted(trade_date)
         return trade_date
 
-    def load_processed_alpha(self, name, fields=None):
+    def load_processed_alpha_window_list(self, name, window_list, fields=None):
         output = []
-        all_trade_dates = self.get_all_trade_dates()
 
-        for date in all_trade_dates:
+        for date in window_list:
             try:
                 with h5py.File(AlphaOutputPath + "\\" + name + "\\" + str(date) + ".hdf5", 'r') as f:
                     curfiles = []

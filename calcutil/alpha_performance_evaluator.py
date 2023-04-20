@@ -1,3 +1,4 @@
+from calcutil import other_metric_report
 from calcutil.alpha_calc_config import calc_start, calc_end, pool_size
 from data.dataloader import DataLoader
 from data.dataprocessor import DataProcessor
@@ -37,8 +38,9 @@ class PerformanceEvaluator:
 
     def evaluate(self, alpha_list):
         pool = multiprocessing.Pool(pool_size)
-        pool.map(self.evaluate_single_alpha, alpha_list)
-        # TODO: add alpha uniqueness
+        all_returns = pool.map(self.evaluate_single_alpha, alpha_list)
+        print("***** correlation matrix *****")
+        print(pd.concat(all_returns, axis=1).corr())
         pool.close()
 
     def adjust_halt(self, alpha):
@@ -52,13 +54,13 @@ class PerformanceEvaluator:
     def evaluate_single_alpha(self, alpha_name):
         t = time.perf_counter()
         trade_dates = self.data_loader.get_trade_date_between(calc_start, calc_end)
-        alpha = self.data_loader.load_processed_alpha(alpha_name)
+        alpha = self.data_loader.load_processed_alpha_window_list(alpha_name, trade_dates)
         alpha["code"] = alpha["code"].apply(lambda x: x.decode('utf-8'))
-        halt_adj_alpha = self.adjust_halt(alpha).rename("weight").reset_index()
 
-        # delay 1: getting weight eod day T, trade in T+1, get return T+2
-        # TODO: change halt adjust halt to T+1
-        delay_1_alpha = halt_adj_alpha.pivot_table(index="date", columns="code", values="weight").shift(2)
+        # delay 1: getting weight eod day T, trade in T+1, get return T+2. T+1 weight not achievable with halt
+        alpha = alpha.pivot_table(index="date", columns="code", values="weight").shift(1).stack().rename("weight").reset_index()
+        halt_adj_alpha = self.adjust_halt(alpha).rename("weight").reset_index()
+        delay_1_alpha = halt_adj_alpha.pivot_table(index="date", columns="code", values="weight").shift(1)
         delay_1_alpha = delay_1_alpha.stack().rename("weight").reset_index()
 
         returns = self.data_loader.load_processed_window_list("pv_1min_return", trade_dates)
@@ -75,9 +77,14 @@ class PerformanceEvaluator:
         qs.reports.html(return_series["contributed_return"], output=True,
                         download_filename=TearSheetOutputPath + f"\\{alpha_name}.html")
 
-        # TODO: add html output for other metrics
         other_metrics = pd.concat([turnover(merged_return).rename("turnover"),
                                    longside_return(merged_return).rename("longside_return"),
                                    shortside_return(merged_return).rename("shortside_return")], axis=1)
         other_metrics.to_csv(OtherPerfOutputPath + f"\\{alpha_name}.csv")
+        other_metrics.index = pd.to_datetime(other_metrics.index.astype(str))
+
+        other_metric_report.html(other_metrics, output=True,
+                                 download_filename=OtherPerfOutputPath + f"\\{alpha_name}.html")
         logger.info(f"calculated performance for {alpha_name} in {time.perf_counter() - t} seconds")
+
+        return return_series["contributed_return"].rename(alpha_name)
