@@ -301,7 +301,7 @@ class VolAdjTSMomentum:
             returns = returns.pivot_table(index="date", columns="code", values="return")
             returns = returns.reindex(universe, axis=1).dropna(how="any", axis=1)
 
-            vol_adj_return = (returns.tail(self.parameter["lookbackwindow"]) - returns.mean()) / returns.std()
+            vol_adj_return = (returns.tail(self.parameter["lookbackwindow"]).mean() - returns.mean()) / returns.std()
             total_return_avg = vol_adj_return.mean()
             total_return_sum = vol_adj_return.apply(lambda x: abs(x)).sum() / 2
             weight = (vol_adj_return - total_return_avg) / total_return_sum
@@ -331,12 +331,12 @@ class EWMAAdjMomentum:
         try:
             idx = trade_dates.index(date)
             returns = self.data_loader.load_processed_window_list("pv_1min_return",
-                                                                  trade_dates[idx - self.parameter["lookback"]:idx + 1])
+                                                                  trade_dates[idx - self.parameter["lookbackwindow"]:idx + 1])
             returns["code"] = returns["code"].apply(lambda x: x.decode('utf-8'))
             returns = returns.pivot_table(index="date", columns="code", values="return")
             returns = returns.reindex(universe, axis=1).dropna(how="any", axis=1)
 
-            ewma_adj_return = returns.ewm(span=self.parameter["span"])
+            ewma_adj_return = returns.ewm(span=self.parameter["span"]).mean().tail(1).transpose()[str(date)]
             total_return_avg = ewma_adj_return.mean()
             total_return_sum = ewma_adj_return.apply(lambda x: abs(x)).sum() / 2
             weight = (ewma_adj_return - total_return_avg) / total_return_sum

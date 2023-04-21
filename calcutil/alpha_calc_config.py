@@ -51,7 +51,7 @@ alpha_calculator_cfg_dict = {
         }
     },
     "gapped_reversal_63": {
-        "classname": "Price.Reversal",
+        "classname": "Price.GappedReversal",
         "universe": "ZZ9999",
         "parameters": {
             "lookbackstart": 21,
@@ -59,7 +59,7 @@ alpha_calculator_cfg_dict = {
         }
     },
     "gapped_reversal_21": {
-        "classname": "Price.Reversal",
+        "classname": "Price.GappedReversal",
         "universe": "ZZ9999",
         "parameters": {
             "lookbackstart": 5,
@@ -67,7 +67,7 @@ alpha_calculator_cfg_dict = {
         }
     },
     "gapped_reversal_10": {
-        "classname": "Price.Reversal",
+        "classname": "Price.GappedReversal",
         "universe": "ZZ9999",
         "parameters": {
             "lookbackstart": 3,
