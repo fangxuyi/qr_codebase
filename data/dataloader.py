@@ -3,18 +3,33 @@ import h5py
 import logging
 import pandas as pd
 
+from .reference_dataloader import ReferenceDataLoader
+
 logger = logging.getLogger(__name__)
+
 
 # TODO: add cache to data loader
 
 class DataLoader:
-    def __init__(self, referenceData):
-        self.referenceData = referenceData
-        self.trade_dates = self.get_all_trade_dates()
+    referenceDataLoader = ReferenceDataLoader
+    trade_dates = None
+    halt_date = None
+
+    def __init__(self):
+        pass
 
     def get_all_trade_dates(self):
-        trade_date = self.referenceData["Calendar"][["date", "is_open"]].astype(int)
-        trade_date = trade_date[(trade_date["is_open"] == 1)]["date"].tolist()
+        if self.trade_dates is None:
+            trade_date = self.referenceDataLoader.load_reference_data("Calendar")[["date", "is_open"]].astype(int)
+            trade_date = trade_date[(trade_date["is_open"] == 1)]["date"].tolist()
+            trade_date = sorted(trade_date)
+            self.trade_date = trade_date
+        return self.trade_date
+
+    def get_trade_date_between(self, calc_start, calc_end):
+        trade_date = self.get_all_trade_dates()
+        trade_date = trade_date[(trade_date["is_open"] == 1) & (trade_date["date"] >= int(calc_start)) & (
+                trade_date["date"] <= int(calc_end))]["date"].tolist()
         trade_date = sorted(trade_date)
         return trade_date
 
@@ -80,36 +95,30 @@ class DataLoader:
         return pd.concat(output).reset_index(drop=True)
 
     def get_halt_date(self):
+        if self.halt_date is None:
+            halt_date = self.referenceDataLoader.load_reference_data("HaltDate").copy()
+            halt_date["restart_inclusive"] = halt_date.apply(lambda x: x["restart_time"] > 93000, axis=1)
+            trade_date = self.referenceDataLoader.load_reference_data("Calendar").copy()
+            trade_date = trade_date[trade_date["is_open"] == 1]
 
-        halt_date = self.referenceData["HaltDate"].copy()
-        halt_date["restart_inclusive"] = halt_date.apply(lambda x: x["restart_time"] > 93000, axis=1)
-        trade_date = self.referenceData["Calendar"].copy()
-        trade_date = trade_date[trade_date["is_open"] == 1]
-
-        output = []
-        for row in halt_date.iterrows():
-            code = row[1]["code"]
-            halt_start = row[1]["halt_date"]
-            restart_date = row[1]["restart_date"]
-            if row[1]["restart_inclusive"]:
-                tmp = trade_date[(trade_date["date"] >= halt_start) & (trade_date["date"] <= restart_date)].assign(
-                    code=code).assign(is_halt=1)
-            else:
-                tmp = trade_date[(trade_date["date"] >= halt_start) & (trade_date["date"] < restart_date)].assign(
-                    code=code).assign(is_halt=1)
-            output.append(tmp[["code", "date", "is_halt"]])
-        return pd.concat(output)
-
-    def get_trade_date_between(self, calc_start, calc_end):
-        trade_date = self.referenceData["Calendar"][["date", "is_open"]].astype(int)
-        trade_date = trade_date[(trade_date["is_open"] == 1) & (trade_date["date"] >= int(calc_start)) & (
-                trade_date["date"] <= int(calc_end))]["date"].tolist()
-        trade_date = sorted(trade_date)
-        return trade_date
+            output = []
+            for row in halt_date.iterrows():
+                code = row[1]["code"]
+                halt_start = row[1]["halt_date"]
+                restart_date = row[1]["restart_date"]
+                if row[1]["restart_inclusive"]:
+                    tmp = trade_date[(trade_date["date"] >= halt_start) & (trade_date["date"] <= restart_date)].assign(
+                        code=code).assign(is_halt=1)
+                else:
+                    tmp = trade_date[(trade_date["date"] >= halt_start) & (trade_date["date"] < restart_date)].assign(
+                        code=code).assign(is_halt=1)
+                output.append(tmp[["code", "date", "is_halt"]])
+            self.halt_date = pd.concat(output)
+        return self.halt_date
 
     def get_current_universe(self, date, universe):
-        current_universe = self.referenceData[universe]
-        current_universe = current_universe[current_universe["path"].apply(lambda x: str(date) in x)]["code"]
+        current_universe = self.referenceDataLoader.load_reference_data(universe)
+        current_universe = current_universe[current_universe["date_int"].apply(lambda x: int(date) == x)]["code"]
         return pd.DataFrame(current_universe)
 
     def get_adjustment_factor_window(self, date, window):
@@ -123,9 +132,8 @@ class DataLoader:
         return pd.concat(output)
 
     def get_adjustment_factor(self, date):
-        current_cumulative_adjustment_factor = self.referenceData["CumulativeAdjustmentFactor"]
+        current_cumulative_adjustment_factor = self.referenceDataLoader.load_reference_data(
+            "CumulativeAdjustmentFactor")
         current_cumulative_adjustment_factor = \
-            current_cumulative_adjustment_factor[
-                current_cumulative_adjustment_factor["path"].apply(lambda x: str(date) in x)][
-                "code"]
+            current_cumulative_adjustment_factor[current_cumulative_adjustment_factor["date_int"] == int(date)]["code"]
         return pd.DataFrame(current_cumulative_adjustment_factor)

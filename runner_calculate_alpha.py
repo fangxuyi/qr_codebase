@@ -1,7 +1,7 @@
 from calcutil.alpha_calc_config import calc_start, calc_end, alpha_calculator_cfg_dict
 from calcutil.alpha_calculator import AlphaCalculator
 from data.dataloader import DataLoader
-from data.rawdataloader import RawDataLoader
+from data.reference_dataloader import ReferenceDataLoader
 import logging
 
 
@@ -31,10 +31,9 @@ if __name__ == '__main__':
     logger = logging.getLogger(__name__)
     logging.basicConfig(level=logging.INFO)
 
-    reference_data = RawDataLoader.load_all_reference_data()
-    data_loader = DataLoader(reference_data)
+    data_loader = DataLoader()
     dates = data_loader.get_trade_date_between(calc_start, calc_end)
 
     current_cfg = {alpha: alpha_calculator_cfg_dict[alpha] for alpha in alpha_list}
-    AlphaCalculator.alpha_calc(current_cfg, reference_data, data_loader)
+    AlphaCalculator.alpha_calc(current_cfg, data_loader)
 

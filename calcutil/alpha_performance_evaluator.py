@@ -32,9 +32,8 @@ def shortside_return(returns):
 
 class PerformanceEvaluator:
 
-    def __init__(self, reference_data):
-        self.reference_data = reference_data
-        self.data_loader = DataLoader(reference_data)
+    def __init__(self, data_loader):
+        self.data_loader = data_loader
 
     def evaluate(self, alpha_list):
         pool = multiprocessing.Pool(pool_size)

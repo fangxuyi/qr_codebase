@@ -5,12 +5,11 @@ import pandas as pd
 
 class TestAlphaCalc:
 
-    def __init__(self, alpha_name, universe, reference_data, parameter):
+    def __init__(self, alpha_name, universe, parameter):
         self.alpha_name = alpha_name
         self.universe = universe
         self.parameter = parameter
-        self.reference_data = reference_data
-        self.data_loader = DataLoader(reference_data)
+        self.data_loader = DataLoader()
 
     def calculate(self, date):
         trade_dates = self.data_loader.get_all_trade_dates()

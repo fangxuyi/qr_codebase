@@ -1,6 +1,7 @@
 from calcutil.alpha_performance_evaluator import PerformanceEvaluator
-from data.rawdataloader import RawDataLoader
+from data.dataloader import DataLoader
 import logging
+
 
 alpha_perfmc_cfg_list = ["momentum_3_ZZ9999", "momentum_5_ZZ9999", "momentum_10_ZZ9999",
                          "reversal_10_ZZ9999", "reversal_21_ZZ9999", "reversal_63_ZZ9999",
@@ -19,7 +20,7 @@ if __name__ == '__main__':
     logger = logging.getLogger(__name__)
     logging.basicConfig(level=logging.INFO)
 
-    reference_data = RawDataLoader.load_all_reference_data()
-    performance_evaluator = PerformanceEvaluator(reference_data)
+    data_loader = DataLoader
+    performance_evaluator = PerformanceEvaluator(data_loader)
     performance_evaluator.evaluate(alpha_perfmc_cfg_list)
 

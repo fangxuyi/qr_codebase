@@ -1,3 +1,5 @@
+import itertools
+
 from calcutil.alpha_calc_config import calc_start, calc_end, universe_options, pool_size
 import logging
 import multiprocessing
@@ -20,13 +22,22 @@ class AlphaCalculator:
             assert value[cls.universe_string] in universe_options, f"[universe] is required to be one of {universe_options} while input is {value[cls.universe_string]}"
 
     @classmethod
-    def alpha_calc(cls, cfg_dict, reference_data, data_loader):
+    def calc_alpha_for_date(cls, args):
+        t = time.perf_counter()
+        instance = args[0]
+        date = args[1]
+        result = instance.calculate(date)
+        logger.info(f"calculated {args} in {time.perf_counter() - t} seconds")
+        return result
+
+    @classmethod
+    def alpha_calc(cls, cfg_dict, data_loader):
 
         cls.validate_config(cfg_dict)
         trade_dates = data_loader.get_trade_date_between(calc_start, calc_end)
 
+        instances = []
         for key, value in cfg_dict.items():
-            t = time.perf_counter()
             alpha_name = key
             class_name = value[cls.class_name_string]
             universe = value[cls.universe_string]
@@ -36,11 +47,13 @@ class AlphaCalculator:
             class_ = getattr(__import__("alpha." + cls_names[0]), cls_names[0])
             for ele in cls_names[1:]:
                 class_ = getattr(class_, ele)
-            instance = class_(alpha_name, universe, reference_data, parameters)
+            instance = class_(alpha_name, universe, parameters)
+            instances.append(instance)
 
-            pool = multiprocessing.Pool(pool_size)
-            pool.map(instance.calculate, trade_dates)
-            pool.close()
-            logger.info(f"calculated {alpha_name} in {time.perf_counter() - t} seconds")
+        args = list(itertools.product(instances, trade_dates))
+
+        pool = multiprocessing.Pool(pool_size)
+        pool.map(cls.calc_alpha_for_date, args)
+        pool.close()
 
         logger.info("done calculating all alpha.")

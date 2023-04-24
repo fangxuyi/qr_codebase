@@ -7,12 +7,11 @@ import pandas as pd
 
 class Momentum:
 
-    def __init__(self, alpha_name, universe, reference_data, parameter):
+    def __init__(self, alpha_name, universe, parameter):
         self.alpha_name = alpha_name
         self.universe = universe
         self.parameter = parameter
-        self.reference_data = reference_data
-        self.data_loader = DataLoader(reference_data)
+        self.data_loader = DataLoader()
 
     def calculate(self, date):
         trade_dates = self.data_loader.get_all_trade_dates()
@@ -40,12 +39,11 @@ class Momentum:
 
 class Reversal:
 
-    def __init__(self, alpha_name, universe, reference_data, parameter):
+    def __init__(self, alpha_name, universe, parameter):
         self.alpha_name = alpha_name
         self.universe = universe
         self.parameter = parameter
-        self.reference_data = reference_data
-        self.data_loader = DataLoader(reference_data)
+        self.data_loader = DataLoader()
 
     def calculate(self, date):
         trade_dates = self.data_loader.get_all_trade_dates()
@@ -73,12 +71,11 @@ class Reversal:
 
 class GappedReversal:
 
-    def __init__(self, alpha_name, universe, reference_data, parameter):
+    def __init__(self, alpha_name, universe, parameter):
         self.alpha_name = alpha_name
         self.universe = universe
         self.parameter = parameter
-        self.reference_data = reference_data
-        self.data_loader = DataLoader(reference_data)
+        self.data_loader = DataLoader()
 
     def calculate(self, date):
         trade_dates = self.data_loader.get_all_trade_dates()
@@ -108,12 +105,11 @@ class GappedReversal:
 
 class TimeSeriesMomentum:
 
-    def __init__(self, alpha_name, universe, reference_data, parameter):
+    def __init__(self, alpha_name, universe, parameter):
         self.alpha_name = alpha_name
         self.universe = universe
         self.parameter = parameter
-        self.reference_data = reference_data
-        self.data_loader = DataLoader(reference_data)
+        self.data_loader = DataLoader()
 
     def calculate(self, date):
         trade_dates = self.data_loader.get_all_trade_dates()
@@ -141,12 +137,11 @@ class TimeSeriesMomentum:
 
 class MomentumChange:
 
-    def __init__(self, alpha_name, universe, reference_data, parameter):
+    def __init__(self, alpha_name, universe, parameter):
         self.alpha_name = alpha_name
         self.universe = universe
         self.parameter = parameter
-        self.reference_data = reference_data
-        self.data_loader = DataLoader(reference_data)
+        self.data_loader = DataLoader()
 
     def calculate(self, date):
         trade_dates = self.data_loader.get_all_trade_dates()
@@ -177,12 +172,11 @@ class MomentumChange:
 
 class MaxRatio:
 
-    def __init__(self, alpha_name, universe, reference_data, parameter):
+    def __init__(self, alpha_name, universe, parameter):
         self.alpha_name = alpha_name
         self.universe = universe
         self.parameter = parameter
-        self.reference_data = reference_data
-        self.data_loader = DataLoader(reference_data)
+        self.data_loader = DataLoader()
 
     def calculate(self, date):
         trade_dates = self.data_loader.get_all_trade_dates()
@@ -211,12 +205,11 @@ class MaxRatio:
 
 class BinaryCount:
 
-    def __init__(self, alpha_name, universe, reference_data, parameter):
+    def __init__(self, alpha_name, universe, parameter):
         self.alpha_name = alpha_name
         self.universe = universe
         self.parameter = parameter
-        self.reference_data = reference_data
-        self.data_loader = DataLoader(reference_data)
+        self.data_loader = DataLoader()
 
     def calculate(self, date):
         trade_dates = self.data_loader.get_all_trade_dates()
@@ -246,12 +239,11 @@ class VolAdjMomentum:
 
     """large return should be more significant for low vol period: continuously moving up is more valuable"""
 
-    def __init__(self, alpha_name, universe, reference_data, parameter):
+    def __init__(self, alpha_name, universe, parameter):
         self.alpha_name = alpha_name
         self.universe = universe
         self.parameter = parameter
-        self.reference_data = reference_data
-        self.data_loader = DataLoader(reference_data)
+        self.data_loader = DataLoader()
 
     def calculate(self, date):
         trade_dates = self.data_loader.get_all_trade_dates()
@@ -282,12 +274,11 @@ class VolAdjTSMomentum:
 
     """time series variation adjusted by volatility: change in low vol period is more valuable"""
 
-    def __init__(self, alpha_name, universe, reference_data, parameter):
+    def __init__(self, alpha_name, universe, parameter):
         self.alpha_name = alpha_name
         self.universe = universe
         self.parameter = parameter
-        self.reference_data = reference_data
-        self.data_loader = DataLoader(reference_data)
+        self.data_loader = DataLoader()
 
     def calculate(self, date):
         trade_dates = self.data_loader.get_all_trade_dates()
@@ -318,12 +309,11 @@ class EWMAAdjMomentum:
 
     """recent price action is more valuable"""
 
-    def __init__(self, alpha_name, universe, reference_data, parameter):
+    def __init__(self, alpha_name, universe, parameter):
         self.alpha_name = alpha_name
         self.universe = universe
         self.parameter = parameter
-        self.reference_data = reference_data
-        self.data_loader = DataLoader(reference_data)
+        self.data_loader = DataLoader()
 
     def calculate(self, date):
         trade_dates = self.data_loader.get_all_trade_dates()
@@ -353,12 +343,11 @@ class ExpandedTimeSeriesMomentum:
 
     """smooth out recent price movement noise"""
 
-    def __init__(self, alpha_name, universe, reference_data, parameter):
+    def __init__(self, alpha_name, universe, parameter):
         self.alpha_name = alpha_name
         self.universe = universe
         self.parameter = parameter
-        self.reference_data = reference_data
-        self.data_loader = DataLoader(reference_data)
+        self.data_loader = DataLoader()
 
     def calculate(self, date):
         trade_dates = self.data_loader.get_all_trade_dates()
