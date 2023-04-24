@@ -263,9 +263,9 @@ def html(returns, rf=0., grayscale=False,
         f.close()
 
     # prepare timeseries
-    turnover = _utils._prepare_returns(returns["turnover"])
-    longside_return = _utils._prepare_returns(returns["longside_return"])
-    shortside_return = _utils._prepare_returns(returns["shortside_return"])
+    turnover = returns["turnover"]
+    longside_return = returns["longside_return"]
+    shortside_return = returns["longside_return"]
 
     date_range = returns.index.strftime('%e %b, %Y')
     tpl = tpl.replace('{{date_range}}', date_range[0] + ' - ' + date_range[-1])
