@@ -8,49 +8,49 @@ universe_options = [
 ]
 
 alpha_calculator_cfg_dict = {
-    "momentum_3": {
+    "momentum_3_ZZ9999": {
         "classname": "Price.Momentum",
         "universe": "ZZ9999",
         "parameters": {
             "lookback": 3,
         }
     },
-    "momentum_5": {
+    "momentum_5_ZZ9999": {
         "classname": "Price.Momentum",
         "universe": "ZZ9999",
         "parameters": {
             "lookback": 5,
         }
     },
-    "momentum_10": {
+    "momentum_10_ZZ9999": {
         "classname": "Price.Momentum",
         "universe": "ZZ9999",
         "parameters": {
             "lookback": 10,
         }
     },
-    "reversal_10": {
+    "reversal_10_ZZ9999": {
         "classname": "Price.Reversal",
         "universe": "ZZ9999",
         "parameters": {
             "lookback": 10,
         }
     },
-    "reversal_21": {
+    "reversal_21_ZZ9999": {
         "classname": "Price.Reversal",
         "universe": "ZZ9999",
         "parameters": {
             "lookback": 21,
         }
     },
-    "reversal_63": {
+    "reversal_63_ZZ9999": {
         "classname": "Price.Reversal",
         "universe": "ZZ9999",
         "parameters": {
             "lookback": 63,
         }
     },
-    "gapped_reversal_63": {
+    "gapped_reversal_63_ZZ9999": {
         "classname": "Price.GappedReversal",
         "universe": "ZZ9999",
         "parameters": {
@@ -58,7 +58,7 @@ alpha_calculator_cfg_dict = {
             "lookbackend": 63,
         }
     },
-    "gapped_reversal_21": {
+    "gapped_reversal_21_ZZ9999": {
         "classname": "Price.GappedReversal",
         "universe": "ZZ9999",
         "parameters": {
@@ -66,7 +66,7 @@ alpha_calculator_cfg_dict = {
             "lookbackend": 21,
         }
     },
-    "gapped_reversal_10": {
+    "gapped_reversal_10_ZZ9999": {
         "classname": "Price.GappedReversal",
         "universe": "ZZ9999",
         "parameters": {
@@ -74,28 +74,28 @@ alpha_calculator_cfg_dict = {
             "lookbackend": 10,
         }
     },
-    "ts_momentum_3": {
+    "ts_momentum_3_ZZ9999": {
         "classname": "Price.Momentum",
         "universe": "ZZ9999",
         "parameters": {
             "lookback": 3,
         }
     },
-    "ts_momentum_5": {
+    "ts_momentum_5_ZZ9999": {
         "classname": "Price.Momentum",
         "universe": "ZZ9999",
         "parameters": {
             "lookback": 5,
         }
     },
-    "ts_momentum_10": {
+    "ts_momentum_10_ZZ9999": {
         "classname": "Price.Momentum",
         "universe": "ZZ9999",
         "parameters": {
             "lookback": 10,
         }
     },
-    "momentum_change_3": {
+    "momentum_change_3_ZZ9999": {
         "classname": "Price.Momentum",
         "universe": "ZZ9999",
         "parameters": {
@@ -103,7 +103,7 @@ alpha_calculator_cfg_dict = {
             "gap": 1,
         }
     },
-    "momentum_change_5": {
+    "momentum_change_5_ZZ9999": {
         "classname": "Price.Momentum",
         "universe": "ZZ9999",
         "parameters": {
@@ -111,7 +111,7 @@ alpha_calculator_cfg_dict = {
             "gap": 3,
         }
     },
-    "momentum_change_10": {
+    "momentum_change_10_ZZ9999": {
         "classname": "Price.Momentum",
         "universe": "ZZ9999",
         "parameters": {
@@ -119,49 +119,49 @@ alpha_calculator_cfg_dict = {
             "gap": 5,
         }
     },
-    "max_ratio_3": {
+    "max_ratio_3_ZZ9999": {
         "classname": "Price.Momentum",
         "universe": "ZZ9999",
         "parameters": {
             "lookback": 3,
         }
     },
-    "max_ratio_5": {
+    "max_ratio_5_ZZ9999": {
         "classname": "Price.Momentum",
         "universe": "ZZ9999",
         "parameters": {
             "lookback": 5,
         }
     },
-    "max_ratio_10": {
+    "max_ratio_10_ZZ9999": {
         "classname": "Price.Momentum",
         "universe": "ZZ9999",
         "parameters": {
             "lookback": 10,
         }
     },
-    "binary_count_3": {
+    "binary_count_3_ZZ9999": {
         "classname": "Price.Momentum",
         "universe": "ZZ9999",
         "parameters": {
             "lookback": 3,
         }
     },
-    "binary_count_5": {
+    "binary_count_5_ZZ9999": {
         "classname": "Price.Momentum",
         "universe": "ZZ9999",
         "parameters": {
             "lookback": 5,
         }
     },
-    "binary_count_10": {
+    "binary_count_10_ZZ9999": {
         "classname": "Price.Momentum",
         "universe": "ZZ9999",
         "parameters": {
             "lookback": 10,
         }
     },
-    "vol_adj_momentum_3": {
+    "vol_adj_momentum_3_ZZ9999": {
         "classname": "Price.VolAdjMomentum",
         "universe": "ZZ9999",
         "parameters": {
@@ -169,7 +169,7 @@ alpha_calculator_cfg_dict = {
             "volwindow": 21,
         }
     },
-    "vol_adj_momentum_5": {
+    "vol_adj_momentum_5_ZZ9999": {
         "classname": "Price.VolAdjMomentum",
         "universe": "ZZ9999",
         "parameters": {
@@ -177,7 +177,7 @@ alpha_calculator_cfg_dict = {
             "volwindow": 21,
         }
     },
-    "vol_adj_momentum_10": {
+    "vol_adj_momentum_10_ZZ9999": {
         "classname": "Price.VolAdjMomentum",
         "universe": "ZZ9999",
         "parameters": {
@@ -185,7 +185,7 @@ alpha_calculator_cfg_dict = {
             "volwindow": 21,
         }
     },
-    "vol_adj_ts_momentum_3": {
+    "vol_adj_ts_momentum_3_ZZ9999": {
         "classname": "Price.VolAdjTSMomentum",
         "universe": "ZZ9999",
         "parameters": {
@@ -193,7 +193,7 @@ alpha_calculator_cfg_dict = {
             "volwindow": 21,
         }
     },
-    "vol_adj_ts_momentum_5": {
+    "vol_adj_ts_momentum_5_ZZ9999": {
         "classname": "Price.VolAdjTSMomentum",
         "universe": "ZZ9999",
         "parameters": {
@@ -201,7 +201,7 @@ alpha_calculator_cfg_dict = {
             "volwindow": 21,
         }
     },
-    "vol_adj_ts_momentum_10": {
+    "vol_adj_ts_momentum_10_ZZ9999": {
         "classname": "Price.VolAdjTSMomentum",
         "universe": "ZZ9999",
         "parameters": {
@@ -209,7 +209,7 @@ alpha_calculator_cfg_dict = {
             "volwindow": 21,
         }
     },
-    "ewma_adj_momentum_3": {
+    "ewma_adj_momentum_3_ZZ9999": {
         "classname": "Price.EWMAAdjMomentum",
         "universe": "ZZ9999",
         "parameters": {
@@ -217,7 +217,7 @@ alpha_calculator_cfg_dict = {
             "span": 3,
         }
     },
-    "ewma_adj_momentum_5": {
+    "ewma_adj_momentum_5_ZZ9999": {
         "classname": "Price.EWMAAdjMomentum",
         "universe": "ZZ9999",
         "parameters": {
@@ -225,7 +225,7 @@ alpha_calculator_cfg_dict = {
             "span": 3,
         }
     },
-    "ewma_adj_momentum_10": {
+    "ewma_adj_momentum_10_ZZ9999": {
         "classname": "Price.EWMAAdjMomentum",
         "universe": "ZZ9999",
         "parameters": {
@@ -233,7 +233,7 @@ alpha_calculator_cfg_dict = {
             "span": 3,
         }
     },
-    "expanded_ts_momentum_3": {
+    "expanded_ts_momentum_3_ZZ9999": {
         "classname": "Price.ExpandedTimeSeriesMomentum",
         "universe": "ZZ9999",
         "parameters": {
@@ -241,7 +241,7 @@ alpha_calculator_cfg_dict = {
             "shortwindow": 3,
         }
     },
-    "expanded_ts_momentum_5": {
+    "expanded_ts_momentum_5_ZZ9999": {
         "classname": "Price.ExpandedTimeSeriesMomentum",
         "universe": "ZZ9999",
         "parameters": {
@@ -249,7 +249,7 @@ alpha_calculator_cfg_dict = {
             "shortwindow": 5,
         }
     },
-    "expanded_ts_momentum_10": {
+    "expanded_ts_momentum_10_ZZ9999": {
         "classname": "Price.ExpandedTimeSeriesMomentum",
         "universe": "ZZ9999",
         "parameters": {
