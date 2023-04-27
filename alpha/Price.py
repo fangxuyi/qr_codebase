@@ -31,7 +31,7 @@ class Momentum:
             weight = pd.DataFrame(weight.rename("weight"))
             weight["date"] = date
             weight = weight.reset_index()
-            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name + "_" + self.universe)
+            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name)
 
         except:
             pass
@@ -63,7 +63,7 @@ class Reversal:
             weight = pd.DataFrame(weight.rename("weight"))
             weight["date"] = date
             weight = weight.reset_index()
-            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name + "_" + self.universe)
+            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name)
 
         except:
             pass
@@ -97,7 +97,7 @@ class GappedReversal:
             weight = pd.DataFrame(weight.rename("weight"))
             weight["date"] = date
             weight = weight.reset_index()
-            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name + "_" + self.universe)
+            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name)
 
         except:
             pass
@@ -129,7 +129,7 @@ class TimeSeriesMomentum:
             weight = pd.DataFrame(weight.rename("weight"))
             weight["date"] = date
             weight = weight.reset_index()
-            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name + "_" + self.universe)
+            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name)
 
         except:
             pass
@@ -164,7 +164,7 @@ class MomentumChange:
             weight = pd.DataFrame(weight.rename("weight"))
             weight["date"] = date
             weight = weight.reset_index()
-            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name + "_" + self.universe)
+            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name)
 
         except:
             pass
@@ -197,7 +197,7 @@ class MaxRatio:
             weight = pd.DataFrame(weight.rename("weight"))
             weight["date"] = date
             weight = weight.reset_index()
-            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name + "_" + self.universe)
+            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name)
 
         except:
             pass
@@ -229,7 +229,7 @@ class BinaryCount:
             weight = pd.DataFrame(weight.rename("weight"))
             weight["date"] = date
             weight = weight.reset_index()
-            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name + "_" + self.universe)
+            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name)
 
         except:
             pass
@@ -264,7 +264,7 @@ class VolAdjMomentum:
             weight = pd.DataFrame(weight.rename("weight"))
             weight["date"] = date
             weight = weight.reset_index()
-            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name + "_" + self.universe)
+            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name)
 
         except:
             pass
@@ -299,7 +299,7 @@ class VolAdjTSMomentum:
             weight = pd.DataFrame(weight.rename("weight"))
             weight["date"] = date
             weight = weight.reset_index()
-            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name + "_" + self.universe)
+            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name)
 
         except:
             pass
@@ -333,7 +333,7 @@ class EWMAAdjMomentum:
             weight = pd.DataFrame(weight.rename("weight"))
             weight["date"] = date
             weight = weight.reset_index()
-            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name + "_" + self.universe)
+            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name)
 
         except:
             pass
@@ -367,7 +367,170 @@ class ExpandedTimeSeriesMomentum:
             weight = pd.DataFrame(weight.rename("weight"))
             weight["date"] = date
             weight = weight.reset_index()
-            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name + "_" + self.universe)
+            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name)
+
+        except:
+            pass
+
+
+class OpenToCloseMomentum:
+
+    """open to close should have better trending than close to close"""
+
+    def __init__(self, alpha_name, universe, parameter):
+        self.alpha_name = alpha_name
+        self.universe = universe
+        self.parameter = parameter
+        self.data_loader = DataLoader()
+
+    def calculate(self, date):
+        trade_dates = self.data_loader.get_all_trade_dates()
+        universe = self.data_loader.get_current_universe(date, self.universe)["code"].to_list()
+        try:
+            idx = trade_dates.index(date)
+            returns = self.data_loader.load_processed_window_list("pv_1min_standard",
+                                                                  trade_dates[idx - self.parameter["lookback"]:idx + 1],
+                                                                  ["open", "close", "code"]) #no cum_adjf for intraday
+            returns = returns.replace(0.,np.nan)
+            returns["return"] = returns["close"] / returns["open"] - 1
+            returns["code"] = returns["code"].apply(lambda x: x.decode('utf-8'))
+            returns = returns.pivot_table(index="date", columns="code", values="return")
+            returns = returns.reindex(universe, axis=1).dropna(how="any", axis=1)
+
+            total_return = (returns + 1).prod() - 1
+            total_return_avg = total_return.mean()
+            total_return_sum = total_return.apply(lambda x: abs(x)).sum() / 2
+            weight = (total_return - total_return_avg) / total_return_sum
+            weight = pd.DataFrame(weight.rename("weight"))
+            weight["date"] = date
+            weight = weight.reset_index()
+            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name)
+
+        except:
+            pass
+
+
+class OpenToCloseMomentumWithVolumeFilter:
+
+    """decreasing volume generates higher momentum?"""
+
+    def __init__(self, alpha_name, universe, parameter):
+        self.alpha_name = alpha_name
+        self.universe = universe
+        self.parameter = parameter
+        self.data_loader = DataLoader()
+
+    def calculate(self, date):
+        trade_dates = self.data_loader.get_all_trade_dates()
+        universe = self.data_loader.get_current_universe(date, self.universe)["code"].to_list()
+        try:
+            idx = trade_dates.index(date)
+            returns = self.data_loader.load_processed_window_list("pv_1min_return",
+                                                                  trade_dates[idx - self.parameter["lookback"]:idx + 1])
+            returns["code"] = returns["code"].apply(lambda x: x.decode('utf-8'))
+            returns = returns.pivot_table(index="date", columns="code", values="return")
+            returns = returns.reindex(universe, axis=1).dropna(how="any", axis=1)
+
+            volumes = self.data_loader.load_processed_window_list("pv_1min_standard",
+                                                                  trade_dates[idx - self.parameter["lookback"]:idx + 1],
+                                                                  ["daily_volume", "code"])
+            volumes["code"] = volumes["code"].apply(lambda x: x.decode('utf-8'))
+            volumes = volumes.pivot_table(index="date", columns="code", values="daily_volume")
+            volumes = volumes.reindex(universe, axis=1).dropna(how="any", axis=1)
+            volumes_change = (volumes.diff() / volumes.shift()).mean()
+
+            total_return = (returns + 1).prod() - 1
+            total_return = total_return[volumes_change < 0]
+            total_return_avg = total_return.mean()
+            total_return_sum = total_return.apply(lambda x: abs(x)).sum() / 2
+            weight = (total_return - total_return_avg) / total_return_sum
+            weight = pd.DataFrame(weight.rename("weight"))
+            weight["date"] = date
+            weight = weight.reset_index()
+            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name)
+
+        except:
+            pass
+
+
+class OpenToCloseMomentumWithVolumeCorr:
+
+    """same direction movement in volume and price is bearish?"""
+
+    def __init__(self, alpha_name, universe, parameter):
+        self.alpha_name = alpha_name
+        self.universe = universe
+        self.parameter = parameter
+        self.data_loader = DataLoader()
+
+    def calculate(self, date):
+        trade_dates = self.data_loader.get_all_trade_dates()
+        universe = self.data_loader.get_current_universe(date, self.universe)["code"].to_list()
+        try:
+            idx = trade_dates.index(date)
+            returns = self.data_loader.load_processed_window_list("pv_1min_return",
+                                                                  trade_dates[idx - self.parameter["lookback"]:idx + 1])
+            returns["code"] = returns["code"].apply(lambda x: x.decode('utf-8'))
+            returns = returns.pivot_table(index="date", columns="code", values="return")
+            returns = returns.reindex(universe, axis=1).dropna(how="any", axis=1)
+
+            volumes = self.data_loader.load_processed_window_list("pv_1min_standard",
+                                                                  trade_dates[idx - self.parameter["lookback"]:idx + 1],
+                                                                  ["daily_volume", "code"])
+            volumes["code"] = volumes["code"].apply(lambda x: x.decode('utf-8'))
+            volumes = volumes.pivot_table(index="date", columns="code", values="daily_volume")
+            volumes = volumes.reindex(universe, axis=1).dropna(how="any", axis=1)
+            volumes_change = volumes.diff() / volumes.shift()
+
+            ranked_returns = returns.rank(axis=0)
+            ranked_volumes_change = volumes_change.rank(axis=0)
+            corr = ranked_returns.corrwith(ranked_volumes_change, axis=0)
+            corr = corr.dropna()
+
+            corr_avg = corr.mean()
+            corr_sum = corr.apply(lambda x: abs(x)).sum() / 2
+            weight = - (corr - corr_avg) / corr_sum
+            weight = pd.DataFrame(weight.rename("weight"))
+            weight["date"] = date
+            weight = weight.reset_index()
+            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name)
+
+        except:
+            pass
+
+
+class OpenToCloseReversal:
+
+    """this is only here because it worked empirically"""
+
+    def __init__(self, alpha_name, universe, parameter):
+        self.alpha_name = alpha_name
+        self.universe = universe
+        self.parameter = parameter
+        self.data_loader = DataLoader()
+
+    def calculate(self, date):
+        trade_dates = self.data_loader.get_all_trade_dates()
+        universe = self.data_loader.get_current_universe(date, self.universe)["code"].to_list()
+        try:
+            idx = trade_dates.index(date)
+            returns = self.data_loader.load_processed_window_list("pv_1min_standard",
+                                                                  trade_dates[idx - self.parameter["lookback"]:idx + 1],
+                                                                  ["open", "close", "code"]) #no cum_adjf for intraday
+            returns = returns.replace(0.,np.nan)
+            returns["return"] = returns["close"] / returns["open"] - 1
+            returns["code"] = returns["code"].apply(lambda x: x.decode('utf-8'))
+            returns = returns.pivot_table(index="date", columns="code", values="return")
+            returns = returns.reindex(universe, axis=1).dropna(how="any", axis=1)
+
+            total_return = (returns + 1).prod() - 1
+            total_return_avg = total_return.mean()
+            total_return_sum = total_return.apply(lambda x: abs(x)).sum() / 2
+            weight = - (total_return - total_return_avg) / total_return_sum
+            weight = pd.DataFrame(weight.rename("weight"))
+            weight["date"] = date
+            weight = weight.reset_index()
+            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name)
 
         except:
             pass

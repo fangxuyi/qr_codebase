@@ -29,6 +29,104 @@ alpha_calculator_cfg_dict = {
             "lookback": 10,
         }
     },
+    "open_to_close_momentum_w_volume_3_ZZ9999": {
+        "classname": "Price.OpenToCloseMomentumWithVolumeFilter",
+        "universe": "ZZ9999",
+        "parameters": {
+            "lookback": 3,
+        }
+    },
+    "open_to_close_momentum_w_volume_5_ZZ9999": {
+        "classname": "Price.OpenToCloseMomentumWithVolumeFilter",
+        "universe": "ZZ9999",
+        "parameters": {
+            "lookback": 5,
+        }
+    },
+    "open_to_close_momentum_w_volume_10_ZZ9999": {
+        "classname": "Price.OpenToCloseMomentumWithVolumeFilter",
+        "universe": "ZZ9999",
+        "parameters": {
+            "lookback": 10,
+        }
+    },
+    "open_to_close_momentum_w_volume_corr_7_ZZ9999": {
+        "classname": "Price.OpenToCloseMomentumWithVolumeCorr",
+        "universe": "ZZ9999",
+        "parameters": {
+            "lookback": 7,
+        }
+    },
+    "open_to_close_momentum_w_volume_corr_15_ZZ9999": {
+        "classname": "Price.OpenToCloseMomentumWithVolumeCorr",
+        "universe": "ZZ9999",
+        "parameters": {
+            "lookback": 15,
+        }
+    },
+    "open_to_close_momentum_w_volume_corr_21_ZZ9999": {
+        "classname": "Price.OpenToCloseMomentumWithVolumeCorr",
+        "universe": "ZZ9999",
+        "parameters": {
+            "lookback": 21,
+        }
+    },
+    "open_to_close_reversal_3_ZZ9999": {
+        "classname": "Price.OpenToCloseReversal",
+        "universe": "ZZ9999",
+        "parameters": {
+            "lookback": 3,
+        }
+    },
+    "open_to_close_reversal_5_ZZ9999": {
+        "classname": "Price.OpenToCloseReversal",
+        "universe": "ZZ9999",
+        "parameters": {
+            "lookback": 5,
+        }
+    },
+    "open_to_close_reversal_10_ZZ9999": {
+        "classname": "Price.OpenToCloseReversal",
+        "universe": "ZZ9999",
+        "parameters": {
+            "lookback": 10,
+        }
+    },
+    "open_to_close_reversal_21_ZZ9999": {
+        "classname": "Price.OpenToCloseReversal",
+        "universe": "ZZ9999",
+        "parameters": {
+            "lookback": 21,
+        }
+    },
+    "open_to_close_reversal_63_ZZ9999": {
+        "classname": "Price.OpenToCloseReversal",
+        "universe": "ZZ9999",
+        "parameters": {
+            "lookback": 63,
+        }
+    },
+    "open_to_close_momentum_3_ZZ9999": {
+        "classname": "Price.OpenToCloseMomentum",
+        "universe": "ZZ9999",
+        "parameters": {
+            "lookback": 3,
+        }
+    },
+    "open_to_close_momentum_5_ZZ9999": {
+        "classname": "Price.OpenToCloseMomentum",
+        "universe": "ZZ9999",
+        "parameters": {
+            "lookback": 5,
+        }
+    },
+    "open_to_close_momentum_10_ZZ9999": {
+        "classname": "Price.OpenToCloseMomentum",
+        "universe": "ZZ9999",
+        "parameters": {
+            "lookback": 10,
+        }
+    },
     "reversal_10_ZZ9999": {
         "classname": "Price.Reversal",
         "universe": "ZZ9999",

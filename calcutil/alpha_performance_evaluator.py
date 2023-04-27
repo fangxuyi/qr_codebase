@@ -55,7 +55,7 @@ class PerformanceEvaluator:
         trade_dates = self.data_loader.get_trade_date_between(calc_start, calc_end)
         alpha = self.data_loader.load_processed_alpha_window_list(alpha_name, trade_dates)
         alpha["code"] = alpha["code"].apply(lambda x: x.decode('utf-8'))
-
+        # TODO: ADD delay 0 performance evaluator
         # delay 1: getting weight eod day T, trade in T+1, get return T+2. T+1 weight not achievable with halt
         alpha = alpha.pivot_table(index="date", columns="code", values="weight").shift(1).stack().rename("weight").reset_index()
         halt_adj_alpha = self.adjust_halt(alpha).rename("weight").reset_index()
