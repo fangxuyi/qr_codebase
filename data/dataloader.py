@@ -14,6 +14,7 @@ class DataLoader:
     referenceDataLoader = ReferenceDataLoader
     trade_dates = None
     halt_date = None
+    current_universe = {}
 
     def __init__(self):
         pass
@@ -23,13 +24,12 @@ class DataLoader:
             trade_date = self.referenceDataLoader.load_reference_data("Calendar")[["date", "is_open"]].astype(int)
             trade_date = trade_date[(trade_date["is_open"] == 1)]["date"].tolist()
             trade_date = sorted(trade_date)
-            self.trade_date = trade_date
-        return self.trade_date
+            self.trade_dates = trade_date
+        return self.trade_dates
 
     def get_trade_date_between(self, calc_start, calc_end):
         trade_date = self.get_all_trade_dates()
-        trade_date = trade_date[(trade_date["is_open"] == 1) & (trade_date["date"] >= int(calc_start)) & (
-                trade_date["date"] <= int(calc_end))]["date"].tolist()
+        trade_date = [date for date in trade_date if (date >= int(calc_start)) and (date <= int(calc_end))]
         trade_date = sorted(trade_date)
         return trade_date
 
@@ -117,8 +117,11 @@ class DataLoader:
         return self.halt_date
 
     def get_current_universe(self, date, universe):
-        current_universe = self.referenceDataLoader.load_reference_data(universe)
-        current_universe = current_universe[current_universe["date_int"].apply(lambda x: int(date) == x)]["code"]
+        if universe not in self.current_universe.keys():
+            current_universe = self.referenceDataLoader.load_reference_data(universe)
+            self.current_universe[universe] = current_universe
+        current_universe = self.current_universe[universe]
+        current_universe = current_universe[current_universe["date_int"] == int(date)]["code"]
         return pd.DataFrame(current_universe)
 
     def get_adjustment_factor_window(self, date, window):

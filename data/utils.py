@@ -21,8 +21,8 @@ def read_csv_pandas(filenames, **kwargs):
     for filename in filenames:
         df = pd.read_csv(filename, **kwargs)
         date_matched = re.search(r"\d{4}(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])", filename)
-        date_matched = "None" if date_matched is None else date_matched[0]
-        df["date_int"] = int(date_matched)
+        date_matched = "None" if date_matched is None else int(date_matched[0])
+        df["date_int"] = date_matched
         df["path"] = filename
         output.append(df)
     if len(output) > 0:
