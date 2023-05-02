@@ -35,8 +35,8 @@ class DataProcessor:
         logger.debug(f"load_pv_data finished in {time.perf_counter() - t} seconds")
         processed_daily_pv = self.process_1min_pv_to_daily(pv_data_processor, pv_data)
         logger.debug(f"process_1min_pv_to_daily finished in {time.perf_counter() - t} seconds")
-        processed_daily_pv = self.add_reference_data(processed_daily_pv, date)
-        logger.debug(f"added all reference data in {time.perf_counter() - t} seconds")
+        # processed_daily_pv = self.add_reference_data(processed_daily_pv, date)
+        # logger.debug(f"added all reference data in {time.perf_counter() - t} seconds")
         # processed_daily_pv.to_csv(self.outputpath.replace("hdf5", "csv"))
         self.write_data(date, processed_daily_pv, self.org_structure)
         logger.debug(f"wrote data in {time.perf_counter() - t} seconds")
@@ -48,7 +48,7 @@ class DataProcessor:
             raise Exception("Method not implemented")
 
         with h5py.File(self.outputpath, 'a') as f:
-            dategroup = f.create_group(date)
+            dategroup = f.create_group(str(date))
             for column in daily_df.columns:
                 try:
                     dategroup.create_dataset(column, data=daily_df[column].to_numpy())

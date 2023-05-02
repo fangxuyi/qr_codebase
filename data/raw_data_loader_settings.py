@@ -1,6 +1,8 @@
 from pathlib import Path
 from enum import Enum
 
+import pandas as pd
+import numpy as np
 
 BASE_DIR = str(Path(__file__).resolve().parent.parent.parent)
 DataPath = BASE_DIR + r"\Data"
@@ -15,6 +17,8 @@ OtherPerfOutputPath = DataPath + r"\othermetrics"
 
 
 def standard_pv_data_processor(pv_data):
+    """pv_1min_standard"""
+
     pv_data = pv_data.sort_values("time")
 
     pv_data["open_time"] = pv_data["time"]
@@ -40,6 +44,87 @@ def standard_pv_data_processor(pv_data):
         "daily_turover": "last",
         "daily_tradenum": "last",
     })
+
+
+def minute_open_high_low_close(pv_data):
+    """pv_1min_high_low_open_close"""
+
+    pv_data = pv_data.sort_values("time")
+
+    pv_data["open_time"] = pv_data["time"]
+    pv_data["close_time"] = pv_data["time"]
+    pv_data["prev_close"] = pv_data["pre_close"]
+    pv_data["open"] = pv_data["open"]
+    pv_data["high"] = pv_data["high"]
+    pv_data["low"] = pv_data["low"]
+    pv_data["close"] = pv_data["close"]
+    pv_data["daily_volume"] = pv_data["accvolume"]
+    pv_data["daily_turover"] = pv_data["accturover"]
+    pv_data["daily_tradenum"] = pv_data["match_items"]
+
+    pv_data["high_low_diff"] = pv_data["high"] - pv_data["low"]
+
+    return pv_data.groupby("code").agg({
+        "high": max,
+        "low": min,
+        "high_low_diff": "sum"
+    })
+
+
+def big_small_turnover_direction(pv_data):
+    """pv_1min_large_small_turnovers"""
+
+    pv_data["return"] = pv_data["close"] / pv_data["open"] - 1
+    pv_data_turnover = pv_data.pivot_table(index="time", columns="code", values="turover").replace(0., np.nan)
+    largest_mins_per_code = {}
+    smallest_mins_per_code = {}
+    for col in pv_data_turnover:
+        largest_mins_per_code[col] = list(pv_data_turnover[col].nlargest(20).index)
+        smallest_mins_per_code[col] = list(pv_data_turnover[col].nsmallest(20).index)
+
+    largest_turnover_per_code = []
+    smallest_turnover_per_code = []
+    largest_returns_per_code = []
+    smallest_returns_per_code = []
+    diff_returns_per_code = []
+    pv_data_return = pv_data.pivot_table(index="time", columns="code", values="return")
+    pv_data_return = pv_data_return.reindex(pv_data_turnover.columns, axis=1)
+    pv_data_return = pv_data_return.reindex(pv_data_turnover.index, axis=0)
+    for col in pv_data_return:
+        largest_returns = pv_data_return.loc[largest_mins_per_code[col], col]
+        largest_turnovers = pv_data_turnover.loc[largest_mins_per_code[col], col]
+        largest_weighted_returns = (largest_returns * largest_turnovers).sum() / largest_turnovers.sum()
+        largest_returns_per_code.append((col, largest_weighted_returns))
+        largest_turnover_per_code.append((col, largest_turnovers.sum()))
+
+        smallest_returns = pv_data_return.loc[smallest_mins_per_code[col], col]
+        smallest_turnovers = pv_data_turnover.loc[smallest_mins_per_code[col], col]
+        smallest_weighted_returns = (smallest_returns * smallest_turnovers).sum() / smallest_turnovers.sum()
+        smallest_returns_per_code.append((col, smallest_weighted_returns))
+        smallest_turnover_per_code.append((col, smallest_turnovers.sum()))
+
+        diff_returns_per_code.append((col, largest_weighted_returns - smallest_weighted_returns))
+
+    largest_returns_per_code_df = pd.DataFrame(largest_returns_per_code)
+    smallest_returns_per_code_df = pd.DataFrame(smallest_returns_per_code)
+    diff_returns_per_code_df = pd.DataFrame(diff_returns_per_code)
+    largest_turnover_per_code_df = pd.DataFrame(largest_turnover_per_code)
+    smallest_turnover_per_code_df = pd.DataFrame(smallest_turnover_per_code)
+
+    largest_returns_per_code_df.columns = ["code", "biggest_turnover_returuns"]
+    smallest_returns_per_code_df.columns = ["code", "smallest_turnover_returns"]
+    diff_returns_per_code_df.columns = ["code", "diff_return"]
+    largest_turnover_per_code_df.columns = ["code", "biggest_turnover_sum"]
+    smallest_turnover_per_code_df.columns = ["code", "smallest_turnover_sum"]
+
+    largest_returns_per_code_df = largest_returns_per_code_df.set_index("code")
+    smallest_returns_per_code_df = smallest_returns_per_code_df.set_index("code")
+    diff_returns_per_code_df = diff_returns_per_code_df.set_index("code")
+    largest_turnover_per_code_df = largest_turnover_per_code_df.set_index("code")
+    smallest_turnover_per_code_df = smallest_turnover_per_code_df.set_index("code")
+
+    return pd.concat([largest_returns_per_code_df, smallest_returns_per_code_df, diff_returns_per_code_df,
+                      largest_turnover_per_code_df, smallest_turnover_per_code_df], axis=1)
 
 
 class FileOrgStructure(Enum):

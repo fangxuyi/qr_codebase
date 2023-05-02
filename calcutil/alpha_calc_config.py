@@ -355,6 +355,35 @@ alpha_calculator_cfg_dict = {
             "shortwindow": 10,
         }
     },
+    "intraday_consistency_3_ZZ9999": {
+        "classname": "Price.ConsistencyInIntradayPriceMovement",
+        "universe": "ZZ9999",
+        "parameters": {
+            "lookback": 3,
+        }
+    },
+    "intraday_consistency_5_ZZ9999": {
+        "classname": "Price.ConsistencyInIntradayPriceMovement",
+        "universe": "ZZ9999",
+        "parameters": {
+            "lookback": 5,
+        }
+    },
+    "intraday_consistency_10_ZZ9999": {
+        "classname": "Price.ConsistencyInIntradayPriceMovement",
+        "universe": "ZZ9999",
+        "parameters": {
+            "lookback": 10,
+        }
+    },
+
+    "intraday_consistency_21_ZZ9999": {
+        "classname": "Price.ConsistencyInIntradayPriceMovement",
+        "universe": "ZZ9999",
+        "parameters": {
+            "lookback": 21,
+        }
+    },
 }
 
 # TODO: yaml file for config

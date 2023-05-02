@@ -10,18 +10,15 @@ if __name__ == '__main__':
 
     logger = logging.getLogger(__name__)
     logging.basicConfig(level=logging.INFO)
+
+    calc_start = "20180101"
     data_loader = DataLoader()
     dates = data_loader.get_trade_date_between(calc_start, calc_end)
 
-    version = "pv_1min_standard"
+    version = "pv_1min_high_low_open_close"
 
-    # process raw data
     data_processor = DataProcessor(version, ReferenceDataLoader, RawDataLoader)
     for date in dates:
         logger.info(f"processing {date}...")
-        data_processor.process(standard_pv_data_processor, date)
-
-    # load processed
-    data_loader = DataLoader()
-    data_loader.load_processed("20181210", version, 5)
+        data_processor.process(minute_open_high_low_close, date)
 
