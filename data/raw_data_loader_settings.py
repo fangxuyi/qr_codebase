@@ -47,6 +47,48 @@ def standard_pv_data_processor(pv_data):
     })
 
 
+def intraday_volatility(pv_data):
+    """pv_1min_intraday_volatility"""
+
+    def std(x):
+        return np.std(x)
+
+    pv_data = pv_data.sort_values("time")
+
+    pv_data["open"] = pv_data["open"]
+    pv_data["close"] = pv_data["close"]
+
+    pv_data["intraday_vol"] = pv_data["close"] / pv_data["open"] - 1
+
+    return pv_data.groupby("code").agg({
+        "open": "first",
+        "close": "last",
+        "intraday_vol": std,
+    })
+
+
+def daily_vwap(pv_data):
+    """pv_1min_daily_vwap"""
+
+    pv_data = pv_data.sort_values("time")
+
+    pv_data["open"] = pv_data["open"]
+    pv_data["close"] = pv_data["close"]
+    pv_data["return"] = pv_data["close"] / pv_data["open"] - 1
+
+    pv_data["volume"] = pv_data["volume"]
+    pv_data["vwap"] = pv_data["accturover"] / pv_data["accvolume"]
+    pv_data["weighted_return"] = pv_data["return"] * pv_data["volume"]
+
+    pv_data = pv_data.groupby("code").agg({
+        "vwap": "last",
+        "weighted_return": "sum",
+        "volume": "sum",
+    })
+    pv_data["weighted_avg_return"] = pv_data["weighted_return"] / pv_data["volume"]
+    return pv_data
+
+
 def minute_open_high_low_close(pv_data):
     """pv_1min_high_low_open_close"""
 

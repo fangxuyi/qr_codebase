@@ -37,3 +37,20 @@ if __name__ == '__main__':
     for date in dates:
         logger.info(f"processing {date}...")
         data_processor.process(momentum_without_extreme_value, date)
+
+
+    version = "pv_1min_intraday_volatility"
+
+    data_processor = DataProcessor(version, ReferenceDataLoader, RawDataLoader)
+    for date in dates:
+        logger.info(f"processing {date}...")
+        data_processor.process(intraday_volatility, date)
+
+
+    version = "pv_1min_daily_vwap"
+
+    data_processor = DataProcessor(version, ReferenceDataLoader, RawDataLoader)
+    for date in dates:
+        logger.info(f"processing {date}...")
+        data_processor.process(daily_vwap, date)
+
