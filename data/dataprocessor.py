@@ -35,6 +35,8 @@ class DataProcessor:
         logger.debug(f"load_pv_data finished in {time.perf_counter() - t} seconds")
         processed_daily_pv = self.process_1min_pv_to_daily(pv_data_processor, pv_data)
         logger.debug(f"process_1min_pv_to_daily finished in {time.perf_counter() - t} seconds")
+        processed_daily_pv = processed_daily_pv.reset_index().rename(columns={"index": "code"})
+        processed_daily_pv["code"] = processed_daily_pv["code"].astype(np.string_)
         # processed_daily_pv = self.add_reference_data(processed_daily_pv, date)
         # logger.debug(f"added all reference data in {time.perf_counter() - t} seconds")
         # processed_daily_pv.to_csv(self.outputpath.replace("hdf5", "csv"))
@@ -113,7 +115,8 @@ class DataProcessor:
         trade_date_open = trade_date[trade_date["is_open"] == 1][["date", "is_open"]].set_index("date")
         trade_date_all = trade_date[["date", "is_open"]].set_index("date")
 
-        st_status = self.ReferenceDataLoader.load_reference_data_by_name("STDate").copy()[["code", "status_id", "eff_date"]]
+        st_status = self.ReferenceDataLoader.load_reference_data_by_name("STDate").copy()[
+            ["code", "status_id", "eff_date"]]
         st_status = st_status.pivot_table(index="eff_date", columns="code", values="status_id")
         st_status = trade_date_open.join(st_status).ffill().drop(columns="is_open")
         st_status = trade_date_all.join(st_status).drop(columns="is_open")
@@ -132,8 +135,10 @@ class DataProcessor:
 
     def add_reference_data(self, processed_daily_pv, date):
 
-        cumulative_adjustment_factor = self.ReferenceDataLoader.load_reference_data_by_name("CumulativeAdjustmentFactor")[
-            self.ReferenceDataLoader.load_reference_data_by_name("CumulativeAdjustmentFactor")["date_int"] == int(date)].set_index("code")[
+        cumulative_adjustment_factor = \
+        self.ReferenceDataLoader.load_reference_data_by_name("CumulativeAdjustmentFactor")[
+            self.ReferenceDataLoader.load_reference_data_by_name("CumulativeAdjustmentFactor")["date_int"] == int(
+                date)].set_index("code")[
             ["cum_adjf"]]
         cumulative_adjustment_factor["cum_adjf"] = cumulative_adjustment_factor["cum_adjf"].astype(np.float64)
 
@@ -152,21 +157,24 @@ class DataProcessor:
         st_date["status_id"] = st_date["status_id"].astype(np.float64)
 
         sector_classification = self.ReferenceDataLoader.load_reference_data_by_name("Sector")[
-            self.ReferenceDataLoader.load_reference_data_by_name("Sector")["date_int"] == int(date)].set_index("code")[["sw1",
-                                                                                                "sw2",
-                                                                                                "sw3"]]
+            self.ReferenceDataLoader.load_reference_data_by_name("Sector")["date_int"] == int(date)].set_index("code")[
+            ["sw1",
+             "sw2",
+             "sw3"]]
 
         limit_price = self.ReferenceDataLoader.load_reference_data_by_name("LimitPrices")[
-            self.ReferenceDataLoader.load_reference_data_by_name("LimitPrices")["date_int"] == int(date)].set_index("code")[["up_limit",
-                                                                                                     "down_limit"]]
+            self.ReferenceDataLoader.load_reference_data_by_name("LimitPrices")["date_int"] == int(date)].set_index(
+            "code")[["up_limit",
+                     "down_limit"]]
         limit_price["up_limit"] = limit_price["up_limit"].astype(np.float64)
         limit_price["down_limit"] = limit_price["down_limit"].astype(np.float64)
 
         market_value = self.ReferenceDataLoader.load_reference_data_by_name("MarketValue")[
-            self.ReferenceDataLoader.load_reference_data_by_name("MarketValue")["date_int"] == int(date)].set_index("code")[["neg_mkt_val",
-                                                                                                     "mkt_val",
-                                                                                                     "neg_shares",
-                                                                                                     "shares"]]
+            self.ReferenceDataLoader.load_reference_data_by_name("MarketValue")["date_int"] == int(date)].set_index(
+            "code")[["neg_mkt_val",
+                     "mkt_val",
+                     "neg_shares",
+                     "shares"]]
         market_value["neg_mkt_val"] = market_value["neg_mkt_val"].astype(np.float64)
         market_value["mkt_val"] = market_value["mkt_val"].astype(np.float64)
         market_value["neg_shares"] = market_value["neg_shares"].astype(np.float64)

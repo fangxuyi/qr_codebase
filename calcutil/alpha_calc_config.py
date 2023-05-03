@@ -384,6 +384,35 @@ alpha_calculator_cfg_dict = {
             "lookback": 21,
         }
     },
+    "top_bottom_return_reversal_3_ZZ9999": {
+        "classname": "Price.TopBottomTradeReversal",
+        "universe": "ZZ9999",
+        "parameters": {
+            "lookback": 3,
+        }
+    },
+    "top_bottom_return_reversal_5_ZZ9999": {
+        "classname": "Price.TopBottomTradeReversal",
+        "universe": "ZZ9999",
+        "parameters": {
+            "lookback": 5,
+        }
+    },
+    "top_bottom_return_reversal_10_ZZ9999": {
+        "classname": "Price.TopBottomTradeReversal",
+        "universe": "ZZ9999",
+        "parameters": {
+            "lookback": 10,
+        }
+    },
+
+    "top_bottom_return_reversal_21_ZZ9999": {
+        "classname": "Price.TopBottomTradeReversal",
+        "universe": "ZZ9999",
+        "parameters": {
+            "lookback": 21,
+        }
+    },
 }
 
 # TODO: yaml file for config

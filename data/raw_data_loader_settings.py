@@ -3,6 +3,7 @@ from enum import Enum
 
 import pandas as pd
 import numpy as np
+from scipy import stats
 
 BASE_DIR = str(Path(__file__).resolve().parent.parent.parent)
 DataPath = BASE_DIR + r"\Data"
@@ -67,7 +68,9 @@ def minute_open_high_low_close(pv_data):
     return pv_data.groupby("code").agg({
         "high": max,
         "low": min,
-        "high_low_diff": "sum"
+        "high_low_diff": "sum",
+        "open": "first",
+        "close": "last"
     })
 
 
@@ -125,6 +128,18 @@ def big_small_turnover_direction(pv_data):
 
     return pd.concat([largest_returns_per_code_df, smallest_returns_per_code_df, diff_returns_per_code_df,
                       largest_turnover_per_code_df, smallest_turnover_per_code_df], axis=1)
+
+
+def momentum_without_extreme_value(pv_data):
+    """pv_1min_daily_return_without_extreme_value"""
+
+    pv_data["return"] = pv_data["close"] / pv_data["open"] - 1
+    pv_data = pv_data.pivot_table(index="time", columns="code", values="return")
+
+    for col in pv_data:
+        pv_data.loc[(np.abs(stats.zscore(pv_data[col])) > 3), col] = 0.
+
+    return pd.DataFrame(pv_data.sum().transpose())
 
 
 class FileOrgStructure(Enum):

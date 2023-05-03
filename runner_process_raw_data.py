@@ -22,3 +22,18 @@ if __name__ == '__main__':
         logger.info(f"processing {date}...")
         data_processor.process(minute_open_high_low_close, date)
 
+
+    version = "pv_1min_large_small_turnovers"
+
+    data_processor = DataProcessor(version, ReferenceDataLoader, RawDataLoader)
+    for date in dates:
+        logger.info(f"processing {date}...")
+        data_processor.process(big_small_turnover_direction, date)
+
+
+    version = "pv_1min_daily_return_without_extreme_value"
+
+    data_processor = DataProcessor(version, ReferenceDataLoader, RawDataLoader)
+    for date in dates:
+        logger.info(f"processing {date}...")
+        data_processor.process(momentum_without_extreme_value, date)
