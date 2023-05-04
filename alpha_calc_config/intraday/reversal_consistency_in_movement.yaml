@@ -1,0 +1,35 @@
+intraday_consistency_10_ZZ9999:
+  classname: Price.ConsistencyInIntradayPriceMovement
+  parameters:
+    lookback: 10
+  universe: ZZ9999
+intraday_consistency_1_ZZ9999:
+  classname: Price.ConsistencyInIntradayPriceMovement
+  parameters:
+    lookback: 1
+  universe: ZZ9999
+intraday_consistency_21_ZZ9999:
+  classname: Price.ConsistencyInIntradayPriceMovement
+  parameters:
+    lookback: 21
+  universe: ZZ9999
+intraday_consistency_2_ZZ9999:
+  classname: Price.ConsistencyInIntradayPriceMovement
+  parameters:
+    lookback: 2
+  universe: ZZ9999
+intraday_consistency_3_ZZ9999:
+  classname: Price.ConsistencyInIntradayPriceMovement
+  parameters:
+    lookback: 3
+  universe: ZZ9999
+intraday_consistency_5_ZZ9999:
+  classname: Price.ConsistencyInIntradayPriceMovement
+  parameters:
+    lookback: 5
+  universe: ZZ9999
+intraday_consistency_63_ZZ9999:
+  classname: Price.ConsistencyInIntradayPriceMovement
+  parameters:
+    lookback: 63
+  universe: ZZ9999

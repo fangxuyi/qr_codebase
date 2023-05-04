@@ -1,0 +1,18 @@
+vol_adj_momentum_10_ZZ9999:
+  classname: Price.VolAdjMomentum
+  parameters:
+    lookbackwindow: 10
+    volwindow: 21
+  universe: ZZ9999
+vol_adj_momentum_3_ZZ9999:
+  classname: Price.VolAdjMomentum
+  parameters:
+    lookbackwindow: 3
+    volwindow: 21
+  universe: ZZ9999
+vol_adj_momentum_5_ZZ9999:
+  classname: Price.VolAdjMomentum
+  parameters:
+    lookbackwindow: 5
+    volwindow: 21
+  universe: ZZ9999

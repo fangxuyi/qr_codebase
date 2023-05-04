@@ -1,0 +1,18 @@
+expanded_ts_momentum_10_ZZ9999:
+  classname: Price.ExpandedTimeSeriesMomentum
+  parameters:
+    lookback: 21
+    shortwindow: 10
+  universe: ZZ9999
+expanded_ts_momentum_3_ZZ9999:
+  classname: Price.ExpandedTimeSeriesMomentum
+  parameters:
+    lookback: 21
+    shortwindow: 3
+  universe: ZZ9999
+expanded_ts_momentum_5_ZZ9999:
+  classname: Price.ExpandedTimeSeriesMomentum
+  parameters:
+    lookback: 21
+    shortwindow: 5
+  universe: ZZ9999

@@ -1,0 +1,15 @@
+open_to_close_momentum_10_ZZ9999:
+  classname: Price.OpenToCloseMomentum
+  parameters:
+    lookback: 10
+  universe: ZZ9999
+open_to_close_momentum_3_ZZ9999:
+  classname: Price.OpenToCloseMomentum
+  parameters:
+    lookback: 3
+  universe: ZZ9999
+open_to_close_momentum_5_ZZ9999:
+  classname: Price.OpenToCloseMomentum
+  parameters:
+    lookback: 5
+  universe: ZZ9999

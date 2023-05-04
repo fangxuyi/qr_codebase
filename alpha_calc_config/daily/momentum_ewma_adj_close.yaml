@@ -1,0 +1,18 @@
+ewma_adj_momentum_10_ZZ9999:
+  classname: Price.EWMAAdjMomentum
+  parameters:
+    lookbackwindow: 10
+    span: 3
+  universe: ZZ9999
+ewma_adj_momentum_3_ZZ9999:
+  classname: Price.EWMAAdjMomentum
+  parameters:
+    lookbackwindow: 3
+    span: 3
+  universe: ZZ9999
+ewma_adj_momentum_5_ZZ9999:
+  classname: Price.EWMAAdjMomentum
+  parameters:
+    lookbackwindow: 5
+    span: 3
+  universe: ZZ9999

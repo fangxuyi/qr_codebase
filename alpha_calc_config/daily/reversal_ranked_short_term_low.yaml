@@ -1,0 +1,25 @@
+ranked_short_term_low_reserval_10_ZZ9999:
+  classname: Price.ShortTermLowReversal
+  parameters:
+    lookback: 10
+  universe: ZZ9999
+ranked_short_term_low_reserval_21_ZZ9999:
+  classname: Price.ShortTermLowReversal
+  parameters:
+    lookback: 21
+  universe: ZZ9999
+ranked_short_term_low_reserval_3_ZZ9999:
+  classname: Price.ShortTermLowReversal
+  parameters:
+    lookback: 3
+  universe: ZZ9999
+ranked_short_term_low_reserval_5_ZZ9999:
+  classname: Price.ShortTermLowReversal
+  parameters:
+    lookback: 5
+  universe: ZZ9999
+ranked_short_term_low_reserval_63_ZZ9999:
+  classname: Price.ShortTermLowReversal
+  parameters:
+    lookback: 63
+  universe: ZZ9999

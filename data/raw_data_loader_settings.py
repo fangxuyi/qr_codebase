@@ -181,7 +181,7 @@ def momentum_without_extreme_value(pv_data):
     for col in pv_data:
         pv_data.loc[(np.abs(stats.zscore(pv_data[col])) > 3), col] = 0.
 
-    return pd.DataFrame(pv_data.sum().transpose())
+    return pd.DataFrame(pv_data.sum().transpose().rename("returns"))
 
 
 class FileOrgStructure(Enum):

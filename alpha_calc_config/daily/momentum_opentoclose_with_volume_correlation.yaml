@@ -1,0 +1,25 @@
+open_to_close_reversal_10_ZZ9999:
+  classname: Price.OpenToCloseReversal
+  parameters:
+    lookback: 10
+  universe: ZZ9999
+open_to_close_reversal_21_ZZ9999:
+  classname: Price.OpenToCloseReversal
+  parameters:
+    lookback: 21
+  universe: ZZ9999
+open_to_close_reversal_3_ZZ9999:
+  classname: Price.OpenToCloseReversal
+  parameters:
+    lookback: 3
+  universe: ZZ9999
+open_to_close_reversal_5_ZZ9999:
+  classname: Price.OpenToCloseReversal
+  parameters:
+    lookback: 5
+  universe: ZZ9999
+open_to_close_reversal_63_ZZ9999:
+  classname: Price.OpenToCloseReversal
+  parameters:
+    lookback: 63
+  universe: ZZ9999

@@ -1,0 +1,18 @@
+gapped_reversal_10_ZZ9999:
+  classname: Price.GappedReversal
+  parameters:
+    lookbackend: 10
+    lookbackstart: 3
+  universe: ZZ9999
+gapped_reversal_21_ZZ9999:
+  classname: Price.GappedReversal
+  parameters:
+    lookbackend: 21
+    lookbackstart: 5
+  universe: ZZ9999
+gapped_reversal_63_ZZ9999:
+  classname: Price.GappedReversal
+  parameters:
+    lookbackend: 63
+    lookbackstart: 21
+  universe: ZZ9999

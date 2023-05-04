@@ -562,7 +562,7 @@ class ConsistencyInIntradayPriceMovement:
             total_return = returns.mean()
             total_return_avg = total_return.mean()
             total_return_sum = total_return.apply(lambda x: abs(x)).sum() / 2
-            weight = (total_return - total_return_avg) / total_return_sum
+            weight = - (total_return - total_return_avg) / total_return_sum
             weight = pd.DataFrame(weight.rename("weight"))
             weight["date"] = date
             weight = weight.reset_index()
@@ -597,7 +597,42 @@ class TopBottomTradeReversal:
             total_return = returns.mean()
             total_return_avg = total_return.mean()
             total_return_sum = total_return.apply(lambda x: abs(x)).sum() / 2
-            weight = (total_return - total_return_avg) / total_return_sum
+            weight = - (total_return - total_return_avg) / total_return_sum
+            weight = pd.DataFrame(weight.rename("weight"))
+            weight["date"] = date
+            weight = weight.reset_index()
+            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name)
+
+        except:
+            pass
+
+
+class ShortTermLowReversal:
+
+    """minimum of low price over a few period of time. the lower the bigger chance of reversal"""
+
+    def __init__(self, alpha_name, universe, parameter):
+        self.alpha_name = alpha_name
+        self.universe = universe
+        self.parameter = parameter
+        self.data_loader = DataLoader()
+
+    def calculate(self, date):
+        trade_dates = self.data_loader.get_all_trade_dates()
+        universe = self.data_loader.get_current_universe(date, self.universe)["code"].to_list()
+        try:
+            idx = trade_dates.index(date)
+            returns = self.data_loader.load_processed_window_list("pv_1min_standard",
+                                                                  trade_dates[idx - self.parameter["lookback"]:idx + 1],
+                                                                  ["code", "open"])
+            returns["code"] = returns["code"].apply(lambda x: x.decode('utf-8'))
+            returns = returns.pivot_table(index="date", columns="code", values="open")
+            returns = returns.reindex(universe, axis=1).dropna(how="any", axis=1)
+
+            returns_ranked = returns.rank(axis=1).rank(axis=0).tail(1).mean()
+            total_return_avg = returns_ranked.mean()
+            total_return_sum = returns_ranked.apply(lambda x: abs(x)).sum() / 2
+            weight = - (returns_ranked - total_return_avg) / total_return_sum
             weight = pd.DataFrame(weight.rename("weight"))
             weight["date"] = date
             weight = weight.reset_index()

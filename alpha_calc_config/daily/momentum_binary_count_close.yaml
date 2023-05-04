@@ -1,0 +1,15 @@
+binary_count_10_ZZ9999:
+  classname: Price.Momentum
+  parameters:
+    lookback: 10
+  universe: ZZ9999
+binary_count_3_ZZ9999:
+  classname: Price.Momentum
+  parameters:
+    lookback: 3
+  universe: ZZ9999
+binary_count_5_ZZ9999:
+  classname: Price.Momentum
+  parameters:
+    lookback: 5
+  universe: ZZ9999

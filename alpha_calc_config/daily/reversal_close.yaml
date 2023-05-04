@@ -1,0 +1,15 @@
+reversal_10_ZZ9999:
+  classname: Price.Reversal
+  parameters:
+    lookback: 10
+  universe: ZZ9999
+reversal_21_ZZ9999:
+  classname: Price.Reversal
+  parameters:
+    lookback: 21
+  universe: ZZ9999
+reversal_63_ZZ9999:
+  classname: Price.Reversal
+  parameters:
+    lookback: 63
+  universe: ZZ9999
