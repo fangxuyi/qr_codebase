@@ -1,0 +1,35 @@
+reversal_without_extreme_10_ZZ9999:
+  classname: Price.ReversalWithoutExtremeValue
+  parameters:
+    lookback: 10
+  universe: ZZ9999
+reversal_without_extreme_1_ZZ9999:
+  classname: Price.ReversalWithoutExtremeValue
+  parameters:
+    lookback: 1
+  universe: ZZ9999
+reversal_without_extreme_21_ZZ9999:
+  classname: Price.ReversalWithoutExtremeValue
+  parameters:
+    lookback: 21
+  universe: ZZ9999
+reversal_without_extreme_2_ZZ9999:
+  classname: Price.ReversalWithoutExtremeValue
+  parameters:
+    lookback: 2
+  universe: ZZ9999
+reversal_without_extreme_3_ZZ9999:
+  classname: Price.ReversalWithoutExtremeValue
+  parameters:
+    lookback: 3
+  universe: ZZ9999
+reversal_without_extreme_5_ZZ9999:
+  classname: Price.ReversalWithoutExtremeValue
+  parameters:
+    lookback: 5
+  universe: ZZ9999
+reversal_without_extreme_63_ZZ9999:
+  classname: Price.ReversalWithoutExtremeValue
+  parameters:
+    lookback: 63
+  universe: ZZ9999

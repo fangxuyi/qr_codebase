@@ -1,15 +1,30 @@
 ts_momentum_10_ZZ9999:
-  classname: Price.Momentum
+  classname: Price.TimeSeriesMomentum
   parameters:
     lookback: 10
   universe: ZZ9999
 ts_momentum_3_ZZ9999:
-  classname: Price.Momentum
+  classname: Price.TimeSeriesMomentum
   parameters:
     lookback: 3
   universe: ZZ9999
 ts_momentum_5_ZZ9999:
-  classname: Price.Momentum
+  classname: Price.TimeSeriesMomentum
   parameters:
     lookback: 5
+  universe: ZZ9999
+ts_momentum_21_ZZ9999:
+  classname: Price.TimeSeriesMomentum
+  parameters:
+    lookback: 21
+  universe: ZZ9999
+ts_momentum_1_ZZ9999:
+  classname: Price.TimeSeriesMomentum
+  parameters:
+    lookback: 1
+  universe: ZZ9999
+ts_momentum_63_ZZ9999:
+  classname: Price.TimeSeriesMomentum
+  parameters:
+    lookback: 63
   universe: ZZ9999

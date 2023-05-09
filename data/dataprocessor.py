@@ -16,7 +16,7 @@ class DataProcessor:
     def __init__(self, name, ReferenceDataLoader, RawDataLoader, org_structure=FileOrgStructure.DATECOLUMN):
         t = time.perf_counter()
         self.name = name
-        self.outputpath = OutputDataPath + "\\" + name + ".hdf5"
+        self.outputpath = OutputDataPath
         self.ReferenceDataLoader = ReferenceDataLoader
         self.PVDataLoader = RawDataLoader
         self.org_structure = org_structure
@@ -24,7 +24,14 @@ class DataProcessor:
         self.processed_st_date = None
         self.processed_columns = set()
 
-    def process(self, pv_data_processor, date, pv_data="1min_PV"):
+    def process_with_args(self, args):
+        temp_names = args[0]
+        temp_data_processors = args[1]
+        temp_date = args[2]
+        print("running for " + str(temp_date))
+        self.process(temp_data_processors, temp_date, temp_names)
+
+    def process(self, pv_data_processors, date, names, pv_data="1min_PV"):
 
         if self.processed_halt_date is None:
             self.processed_halt_date = self.process_halt_date()
@@ -33,23 +40,21 @@ class DataProcessor:
         t = time.perf_counter()
         pv_data = self.PVDataLoader.load_pv_data(pv_data, date, date)
         logger.debug(f"load_pv_data finished in {time.perf_counter() - t} seconds")
-        processed_daily_pv = self.process_1min_pv_to_daily(pv_data_processor, pv_data)
-        logger.debug(f"process_1min_pv_to_daily finished in {time.perf_counter() - t} seconds")
-        processed_daily_pv = processed_daily_pv.reset_index().rename(columns={"index": "code"})
-        processed_daily_pv["code"] = processed_daily_pv["code"].astype(np.string_)
-        # processed_daily_pv = self.add_reference_data(processed_daily_pv, date)
-        # logger.debug(f"added all reference data in {time.perf_counter() - t} seconds")
-        # processed_daily_pv.to_csv(self.outputpath.replace("hdf5", "csv"))
-        self.write_data(date, processed_daily_pv, self.org_structure)
+        for pv_data_processor, name in zip(pv_data_processors, names):
+            processed_daily_pv = self.process_1min_pv_to_daily(pv_data_processor, pv_data)
+            logger.debug(f"process_1min_pv_to_daily finished in {time.perf_counter() - t} seconds")
+            processed_daily_pv = processed_daily_pv.reset_index().rename(columns={"index": "code"})
+            processed_daily_pv["code"] = processed_daily_pv["code"].astype(np.string_)
+            self.write_data(date, processed_daily_pv, name, self.org_structure)
         logger.debug(f"wrote data in {time.perf_counter() - t} seconds")
 
     """ Helper Functions """
 
-    def write_data(self, date, daily_df, org_structure):
+    def write_data(self, date, daily_df, name, org_structure):
         if org_structure is not FileOrgStructure.DATECOLUMN:
             raise Exception("Method not implemented")
 
-        with h5py.File(self.outputpath, 'a') as f:
+        with h5py.File(self.outputpath + "\\" + name + ".hdf5", 'a') as f:
             dategroup = f.create_group(str(date))
             for column in daily_df.columns:
                 try:
@@ -136,10 +141,10 @@ class DataProcessor:
     def add_reference_data(self, processed_daily_pv, date):
 
         cumulative_adjustment_factor = \
-        self.ReferenceDataLoader.load_reference_data_by_name("CumulativeAdjustmentFactor")[
-            self.ReferenceDataLoader.load_reference_data_by_name("CumulativeAdjustmentFactor")["date_int"] == int(
-                date)].set_index("code")[
-            ["cum_adjf"]]
+            self.ReferenceDataLoader.load_reference_data_by_name("CumulativeAdjustmentFactor")[
+                self.ReferenceDataLoader.load_reference_data_by_name("CumulativeAdjustmentFactor")["date_int"] == int(
+                    date)].set_index("code")[
+                ["cum_adjf"]]
         cumulative_adjustment_factor["cum_adjf"] = cumulative_adjustment_factor["cum_adjf"].astype(np.float64)
 
         halt_date = self.processed_halt_date.copy()

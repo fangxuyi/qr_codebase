@@ -1,0 +1,35 @@
+intraday_vol_diff_10_ZZ9999:
+  classname: Price.UpsideDownsideVol
+  parameters:
+    lookback: 10
+  universe: ZZ9999
+intraday_vol_diff_21_ZZ9999:
+  classname: Price.UpsideDownsideVol
+  parameters:
+    lookback: 21
+  universe: ZZ9999
+intraday_vol_diff_5_ZZ9999:
+  classname: Price.UpsideDownsideVol
+  parameters:
+    lookback: 5
+  universe: ZZ9999
+intraday_vol_diff_63_ZZ9999:
+  classname: Price.UpsideDownsideVol
+  parameters:
+    lookback: 63
+  universe: ZZ9999
+intraday_vol_diff_1_ZZ9999:
+  classname: Price.UpsideDownsideVol
+  parameters:
+    lookback: 1
+  universe: ZZ9999
+intraday_vol_diff_2_ZZ9999:
+  classname: Price.UpsideDownsideVol
+  parameters:
+    lookback: 2
+  universe: ZZ9999
+intraday_vol_diff_3_ZZ9999:
+  classname: Price.UpsideDownsideVol
+  parameters:
+    lookback: 3
+  universe: ZZ9999

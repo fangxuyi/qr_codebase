@@ -1,17 +1,25 @@
+from calcutil.alpha_calc_config import load_config_yaml
 from calcutil.alpha_performance_evaluator import PerformanceEvaluator
 from data.dataloader import DataLoader
 import logging
 
-alpha_perfmc_cfg_list = [
-                         "open_to_close_reversal_3_ZZ9999", "open_to_close_reversal_63_ZZ9999", "open_to_close_momentum_w_volume_corr_21_ZZ9999",
-                         "top_bottom_return_reversal_1_ZZ9999", "top_bottom_return_reversal_2_ZZ9999",
-                         "top_bottom_return_reversal_3_ZZ9999",
-                         "top_bottom_return_reversal_5_ZZ9999", "top_bottom_return_reversal_10_ZZ9999",
-                         "top_bottom_return_reversal_21_ZZ9999",
-                         "top_bottom_return_reversal_63_ZZ9999",
-                         "ranked_short_term_low_reserval_3_ZZ9999", "ranked_short_term_low_reserval_5_ZZ9999", "ranked_short_term_low_reserval_10_ZZ9999",
-                         "ranked_short_term_low_reserval_21_ZZ9999", "ranked_short_term_low_reserval_63_ZZ9999"
-]
+
+def merge(dict_list):
+    output = []
+    for dict_item in dict_list:
+        output.extend(list(dict_item.keys()))
+    return output
+
+config_file_names = [r"\intraday\momentum_without_intraday_extreme_value.yaml",
+                     r"\intraday\intraday_vol_trend.yaml",
+                     r"\intraday\volume_consistency.yaml",
+                     r"\intraday\momentum_without_intraday_extreme_value.yaml",
+                     r"\intraday\momentum_ts_close.yaml",
+                     r"\intraday\momentum_max_ratio.yaml",
+                     r"\intraday\momentum_change_close.yaml",
+                     r"\intraday\momentum_binary_count_close.yaml",
+                     ]
+alpha_perfmc_cfg_list = merge([load_config_yaml(config) for config in config_file_names])
 
 if __name__ == '__main__':
 

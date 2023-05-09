@@ -1,15 +1,25 @@
 max_ratio_10_ZZ9999:
-  classname: Price.Momentum
+  classname: Price.MaxRatio
   parameters:
     lookback: 10
   universe: ZZ9999
 max_ratio_3_ZZ9999:
-  classname: Price.Momentum
+  classname: Price.MaxRatio
   parameters:
     lookback: 3
   universe: ZZ9999
 max_ratio_5_ZZ9999:
-  classname: Price.Momentum
+  classname: Price.MaxRatio
   parameters:
     lookback: 5
+  universe: ZZ9999
+max_ratio_21_ZZ9999:
+  classname: Price.MaxRatio
+  parameters:
+    lookback: 21
+  universe: ZZ9999
+max_ratio_63_ZZ9999:
+  classname: Price.MaxRatio
+  parameters:
+    lookback: 63
   universe: ZZ9999

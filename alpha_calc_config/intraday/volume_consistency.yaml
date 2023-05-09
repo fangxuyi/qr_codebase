@@ -1,0 +1,35 @@
+intraday_vol_trend_10_ZZ9999:
+  classname: Price.VolumeConsistency
+  parameters:
+    lookback: 10
+  universe: ZZ9999
+intraday_vol_trend_21_ZZ9999:
+  classname: Price.VolumeConsistency
+  parameters:
+    lookback: 21
+  universe: ZZ9999
+intraday_vol_trend_5_ZZ9999:
+  classname: Price.VolumeConsistency
+  parameters:
+    lookback: 5
+  universe: ZZ9999
+intraday_vol_trend_63_ZZ9999:
+  classname: Price.VolumeConsistency
+  parameters:
+    lookback: 63
+  universe: ZZ9999
+intraday_vol_trend_1_ZZ9999:
+  classname: Price.VolumeConsistency
+  parameters:
+    lookback: 1
+  universe: ZZ9999
+intraday_vol_trend_2_ZZ9999:
+  classname: Price.VolumeConsistency
+  parameters:
+    lookback: 2
+  universe: ZZ9999
+intraday_vol_trend_3_ZZ9999:
+  classname: Price.VolumeConsistency
+  parameters:
+    lookback: 3
+  universe: ZZ9999

@@ -1,3 +1,5 @@
+import multiprocessing
+
 from calcutil.alpha_calc_config import calc_start, calc_end
 from data.dataloader import DataLoader
 from data.dataprocessor import DataProcessor
@@ -15,42 +17,14 @@ if __name__ == '__main__':
     data_loader = DataLoader()
     dates = data_loader.get_trade_date_between(calc_start, calc_end)
 
-    # version = "pv_1min_high_low_open_close"
-    #
-    # data_processor = DataProcessor(version, ReferenceDataLoader, RawDataLoader)
-    # for date in dates:
-    #     logger.info(f"processing {date}...")
-    #     data_processor.process(minute_open_high_low_close, date)
-    #
-    #
-    # version = "pv_1min_large_small_turnovers"
-    #
-    # data_processor = DataProcessor(version, ReferenceDataLoader, RawDataLoader)
-    # for date in dates:
-    #     logger.info(f"processing {date}...")
-    #     data_processor.process(big_small_turnover_direction, date)
-    #
-    #
-    version = "pv_1min_daily_return_without_extreme_value"
+    names = ["pv_1min_intraday_volatility", "pv_1min_high_low_open_close_with_volume_ratio"]
+    data_processors = [intraday_volatility, minute_open_high_low_close_with_volume]
+    data_processor = DataProcessor("multi", ReferenceDataLoader, RawDataLoader)
 
-    data_processor = DataProcessor(version, ReferenceDataLoader, RawDataLoader)
+    args_list = []
     for date in dates:
-        logger.info(f"processing {date}...")
-        data_processor.process(momentum_without_extreme_value, date)
+        args_list.append((names, data_processors, date))
 
-
-    version = "pv_1min_intraday_volatility"
-
-    data_processor = DataProcessor(version, ReferenceDataLoader, RawDataLoader)
-    for date in dates:
-        logger.info(f"processing {date}...")
-        data_processor.process(intraday_volatility, date)
-
-
-    version = "pv_1min_daily_vwap"
-
-    data_processor = DataProcessor(version, ReferenceDataLoader, RawDataLoader)
-    for date in dates:
-        logger.info(f"processing {date}...")
-        data_processor.process(daily_vwap, date)
-
+    pool = multiprocessing.Pool(4)
+    pool.map(data_processor.process_with_args, args_list)
+    pool.close()

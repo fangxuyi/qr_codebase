@@ -1,18 +1,30 @@
 momentum_change_10_ZZ9999:
-  classname: Price.Momentum
+  classname: Price.MomentumChange
   parameters:
     gap: 5
     lookback: 10
   universe: ZZ9999
 momentum_change_3_ZZ9999:
-  classname: Price.Momentum
+  classname: Price.MomentumChange
   parameters:
     gap: 1
     lookback: 3
   universe: ZZ9999
 momentum_change_5_ZZ9999:
-  classname: Price.Momentum
+  classname: Price.MomentumChange
   parameters:
     gap: 3
     lookback: 5
+  universe: ZZ9999
+momentum_change_21_ZZ9999:
+  classname: Price.MomentumChange
+  parameters:
+    gap: 10
+    lookback: 21
+  universe: ZZ9999
+momentum_change_63_ZZ9999:
+  classname: Price.MomentumChange
+  parameters:
+    gap: 21
+    lookback: 63
   universe: ZZ9999

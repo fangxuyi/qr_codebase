@@ -572,6 +572,41 @@ class ConsistencyInIntradayPriceMovement:
             pass
 
 
+class VolumeConsistency:
+
+    """minute level price movement consistency weighted by volume"""
+
+    def __init__(self, alpha_name, universe, parameter):
+        self.alpha_name = alpha_name
+        self.universe = universe
+        self.parameter = parameter
+        self.data_loader = DataLoader()
+
+    def calculate(self, date):
+        trade_dates = self.data_loader.get_all_trade_dates()
+        universe = self.data_loader.get_current_universe(date, self.universe)["code"].to_list()
+        try:
+            idx = trade_dates.index(date)
+            returns = self.data_loader.load_processed_window_list("pv_1min_high_low_open_close_with_volume_ratio",
+                                                                  trade_dates[idx - self.parameter["lookback"]:idx + 1],
+                                                                  ["volume", "code"])
+            returns["code"] = returns["code"].apply(lambda x: x.decode('utf-8'))
+            returns = returns.pivot_table(index="date", columns="code", values="volume")
+            returns = returns.reindex(universe, axis=1).dropna(how="any", axis=1)
+
+            total_return = returns.mean()
+            total_return_avg = total_return.mean()
+            total_return_sum = total_return.apply(lambda x: abs(x)).sum() / 2
+            weight = - (total_return - total_return_avg) / total_return_sum
+            weight = pd.DataFrame(weight.rename("weight"))
+            weight["date"] = date
+            weight = weight.reset_index()
+            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name)
+
+        except:
+            pass
+
+
 class TopBottomTradeReversal:
 
     """if largest trade and smallest trades are correspond to opposite price movement, top returns tend to be fake"""
@@ -640,3 +675,76 @@ class ShortTermLowReversal:
 
         except:
             pass
+
+
+class ReversalWithoutExtremeValue:
+
+    """price movement coming from market impact should be excluded"""
+
+    def __init__(self, alpha_name, universe, parameter):
+        self.alpha_name = alpha_name
+        self.universe = universe
+        self.parameter = parameter
+        self.data_loader = DataLoader()
+
+    def calculate(self, date):
+        trade_dates = self.data_loader.get_all_trade_dates()
+        universe = self.data_loader.get_current_universe(date, self.universe)["code"].to_list()
+        try:
+            idx = trade_dates.index(date)
+            returns = self.data_loader.load_processed_window_list("pv_1min_daily_return_without_extreme_value",
+                                                                  trade_dates[idx - self.parameter["lookback"]:idx + 1],
+                                                                  ["code", "return"])
+            returns["code"] = returns["code"].apply(lambda x: x.decode('utf-8'))
+            returns = returns.pivot_table(index="date", columns="code", values="return")
+            returns = returns.reindex(universe, axis=1).dropna(how="any", axis=1)
+
+            returns_mean = returns.mean()
+            total_return_avg = returns_mean.mean()
+            total_return_sum = returns_mean.apply(lambda x: abs(x)).sum() / 2
+            weight = - (returns_mean - total_return_avg) / total_return_sum
+            weight = pd.DataFrame(weight.rename("weight"))
+            weight["date"] = date
+            weight = weight.reset_index()
+            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name)
+
+        except:
+            pass
+
+
+class UpsideDownsideVol:
+
+    """upside downside vol shows momentum / reversal"""
+
+    def __init__(self, alpha_name, universe, parameter):
+        self.alpha_name = alpha_name
+        self.universe = universe
+        self.parameter = parameter
+        self.data_loader = DataLoader()
+
+    def calculate(self, date):
+        trade_dates = self.data_loader.get_all_trade_dates()
+        universe = self.data_loader.get_current_universe(date, self.universe)["code"].to_list()
+        try:
+            idx = trade_dates.index(date)
+            returns = self.data_loader.load_processed_window_list("pv_1min_intraday_volatility",
+                                                                  trade_dates[idx - self.parameter["lookback"]:idx + 1],
+                                                                  ["code", "intraday_vol_up", "intraday_vol_down"])
+            returns["code"] = returns["code"].apply(lambda x: x.decode('utf-8'))
+            returns["intraday_vol_diff"] = returns["intraday_vol_up"] - returns["intraday_vol_down"]
+            returns = returns.pivot_table(index="date", columns="code", values="intraday_vol_diff")
+            returns = returns.reindex(universe, axis=1).dropna(how="any", axis=1)
+
+            returns_mean = returns.mean()
+            total_return_avg = returns_mean.mean()
+            total_return_sum = returns_mean.apply(lambda x: abs(x)).sum() / 2
+            weight = (returns_mean - total_return_avg) / total_return_sum
+            weight = pd.DataFrame(weight.rename("weight"))
+            weight["date"] = date
+            weight = weight.reset_index()
+            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name)
+
+        except:
+            pass
+
+

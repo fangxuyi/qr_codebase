@@ -51,7 +51,7 @@ def intraday_volatility(pv_data):
     """pv_1min_intraday_volatility"""
 
     def std(x):
-        return np.std(x)
+        return np.std(x.dropna())
 
     pv_data = pv_data.sort_values("time")
 
@@ -59,11 +59,15 @@ def intraday_volatility(pv_data):
     pv_data["close"] = pv_data["close"]
 
     pv_data["intraday_vol"] = pv_data["close"] / pv_data["open"] - 1
+    pv_data["intraday_vol_up"] = pv_data["intraday_vol"].apply(lambda x: x if x > 0 else np.nan)
+    pv_data["intraday_vol_down"] = pv_data["intraday_vol"].apply(lambda x: x if x < 0 else np.nan)
 
     return pv_data.groupby("code").agg({
         "open": "first",
         "close": "last",
         "intraday_vol": std,
+        "intraday_vol_up": std,
+        "intraday_vol_down": std,
     })
 
 
@@ -111,6 +115,29 @@ def minute_open_high_low_close(pv_data):
         "high": max,
         "low": min,
         "high_low_diff": "sum",
+        "open": "first",
+        "close": "last"
+    })
+
+
+def minute_open_high_low_close_with_volume(pv_data):
+    """pv_1min_high_low_open_close_with_volume_ratio"""
+
+    pv_data = pv_data.sort_values("time")
+
+    pv_data["open_time"] = pv_data["time"]
+    pv_data["close_time"] = pv_data["time"]
+    pv_data["prev_close"] = pv_data["pre_close"]
+    pv_data["open"] = pv_data["open"]
+    pv_data["high"] = pv_data["high"]
+    pv_data["low"] = pv_data["low"]
+    pv_data["close"] = pv_data["close"]
+    pv_data["volume"] = pv_data.apply(lambda x: x["volume"] if abs(x["close"] - x["open"]) <= 0.5 * abs(x["high"] - x["low"]) else 0, axis=1)
+
+    return pv_data.groupby("code").agg({
+        "high": max,
+        "low": min,
+        "volume": "sum",
         "open": "first",
         "close": "last"
     })
