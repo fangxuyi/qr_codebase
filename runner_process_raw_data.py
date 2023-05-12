@@ -1,12 +1,11 @@
-import multiprocessing
-
 from calcutil.alpha_calc_config import calc_start, calc_end
 from data.dataloader import DataLoader
 from data.dataprocessor import DataProcessor
-from data.rawdataloader import RawDataLoader
 from data.raw_data_loader_settings import *
-import logging
+from data.rawdataloader import RawDataLoader
 from data.reference_dataloader import ReferenceDataLoader
+import logging
+
 
 if __name__ == '__main__':
 
@@ -24,7 +23,6 @@ if __name__ == '__main__':
     args_list = []
     for date in dates:
         args_list.append((names, data_processors, date))
+    for arg in args_list:
+        data_processor.process_with_args(arg)
 
-    pool = multiprocessing.Pool(4)
-    pool.map(data_processor.process_with_args, args_list)
-    pool.close()

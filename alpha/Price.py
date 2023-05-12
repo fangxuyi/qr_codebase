@@ -694,9 +694,9 @@ class ReversalWithoutExtremeValue:
             idx = trade_dates.index(date)
             returns = self.data_loader.load_processed_window_list("pv_1min_daily_return_without_extreme_value",
                                                                   trade_dates[idx - self.parameter["lookback"]:idx + 1],
-                                                                  ["code", "return"])
+                                                                  ["code", "returns"])
             returns["code"] = returns["code"].apply(lambda x: x.decode('utf-8'))
-            returns = returns.pivot_table(index="date", columns="code", values="return")
+            returns = returns.pivot_table(index="date", columns="code", values="returns")
             returns = returns.reindex(universe, axis=1).dropna(how="any", axis=1)
 
             returns_mean = returns.mean()
@@ -711,6 +711,51 @@ class ReversalWithoutExtremeValue:
         except:
             pass
 
+
+class ReversalWithOnlyExtremeValue:
+
+    """price movement coming from market extreme value is driving return"""
+
+    def __init__(self, alpha_name, universe, parameter):
+        self.alpha_name = alpha_name
+        self.universe = universe
+        self.parameter = parameter
+        self.data_loader = DataLoader()
+
+    def calculate(self, date):
+        trade_dates = self.data_loader.get_all_trade_dates()
+        universe = self.data_loader.get_current_universe(date, self.universe)["code"].to_list()
+        try:
+            idx = trade_dates.index(date)
+            returns = self.data_loader.load_processed_window_list("pv_1min_daily_return_without_extreme_value",
+                                                                  trade_dates[idx - self.parameter["lookback"]:idx + 1],
+                                                                  ["code", "returns"])
+            returns["code"] = returns["code"].apply(lambda x: x.decode('utf-8'))
+            returns = returns.pivot_table(index="date", columns="code", values="returns")
+            returns = returns.reindex(universe, axis=1).dropna(how="any", axis=1)
+
+            returns_all = self.data_loader.load_processed_window_list("pv_1min_standard",
+                                                                  trade_dates[idx - self.parameter["lookback"]:idx + 1],
+                                                                  ["open", "close", "code"]) #no cum_adjf for intraday
+            returns_all = returns_all.replace(0.,np.nan)
+            returns_all["return"] = returns_all["close"] / returns_all["open"] - 1
+            returns_all["code"] = returns_all["code"].apply(lambda x: x.decode('utf-8'))
+            returns_all = returns_all.pivot_table(index="date", columns="code", values="return")
+            returns_all = returns_all.reindex(universe, axis=1).dropna(how="any", axis=1)
+
+            returns = returns_all - returns
+
+            returns_mean = returns.mean()
+            total_return_avg = returns_mean.mean()
+            total_return_sum = returns_mean.apply(lambda x: abs(x)).sum() / 2
+            weight = - (returns_mean - total_return_avg) / total_return_sum
+            weight = pd.DataFrame(weight.rename("weight"))
+            weight["date"] = date
+            weight = weight.reset_index()
+            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name)
+
+        except:
+            pass
 
 class UpsideDownsideVol:
 
@@ -738,7 +783,7 @@ class UpsideDownsideVol:
             returns_mean = returns.mean()
             total_return_avg = returns_mean.mean()
             total_return_sum = returns_mean.apply(lambda x: abs(x)).sum() / 2
-            weight = (returns_mean - total_return_avg) / total_return_sum
+            weight = - (returns_mean - total_return_avg) / total_return_sum
             weight = pd.DataFrame(weight.rename("weight"))
             weight["date"] = date
             weight = weight.reset_index()

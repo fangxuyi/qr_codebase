@@ -28,3 +28,15 @@ momentum_change_63_ZZ9999:
     gap: 21
     lookback: 63
   universe: ZZ9999
+momentum_change_126_ZZ9999:
+  classname: Price.MomentumChange
+  parameters:
+    gap: 63
+    lookback: 126
+  universe: ZZ9999
+momentum_change_252_ZZ9999:
+  classname: Price.MomentumChange
+  parameters:
+    gap: 63
+    lookback: 252
+  universe: ZZ9999

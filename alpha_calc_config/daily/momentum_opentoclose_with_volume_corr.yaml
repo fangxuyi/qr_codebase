@@ -1,20 +1,25 @@
 open_to_close_momentum_w_volume_10_ZZ9999:
-  classname: Price.OpenToCloseMomentumWithVolumeFilter
+  classname: Price.OpenToCloseMomentumWithVolumeCorr
   parameters:
     lookback: 10
   universe: ZZ9999
 open_to_close_momentum_w_volume_3_ZZ9999:
-  classname: Price.OpenToCloseMomentumWithVolumeFilter
+  classname: Price.OpenToCloseMomentumWithVolumeCorr
   parameters:
     lookback: 3
   universe: ZZ9999
 open_to_close_momentum_w_volume_5_ZZ9999:
-  classname: Price.OpenToCloseMomentumWithVolumeFilter
+  classname: Price.OpenToCloseMomentumWithVolumeCorr
   parameters:
     lookback: 5
   universe: ZZ9999
 open_to_close_momentum_w_volume_corr_21_ZZ9999:
-  classname: Price.OpenToCloseMomentumWithVolumeFilter
+  classname: Price.OpenToCloseMomentumWithVolumeCorr
   parameters:
     lookback: 21
+  universe: ZZ9999
+open_to_close_momentum_w_volume_corr_63_ZZ9999:
+  classname: Price.OpenToCloseMomentumWithVolumeCorr
+  parameters:
+    lookback: 63
   universe: ZZ9999

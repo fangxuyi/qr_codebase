@@ -11,14 +11,9 @@ def merge(dict_list):
     return merged_dict
 
 
-config_file_names = [r"\intraday\momentum_without_intraday_extreme_value.yaml",
-                     r"\intraday\intraday_vol_trend.yaml",
-                     r"\intraday\volume_consistency.yaml",
-                     r"\intraday\momentum_without_intraday_extreme_value.yaml",
-                     r"\intraday\momentum_ts_close.yaml",
-                     r"\intraday\momentum_max_ratio.yaml",
-                     r"\intraday\momentum_change_close.yaml",
-                     r"\intraday\momentum_binary_count_close.yaml",
+config_file_names = [
+                     r"\intraday\reversal_without_intraday_extreme_value.yaml",
+                     r"\intraday\reversal_with_only_intraday_extreme_value.yaml",
                      ]
 
 if __name__ == '__main__':
