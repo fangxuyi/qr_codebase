@@ -1,0 +1,40 @@
+reversal_william_support_10_ZZ9999:
+  classname: Price.WilliamSupport
+  parameters:
+    lookback: 10
+  universe: ZZ9999
+reversal_william_support_21_ZZ9999:
+  classname: Price.WilliamSupport
+  parameters:
+    lookback: 21
+  universe: ZZ9999
+reversal_william_support_3_ZZ9999:
+  classname: Price.WilliamSupport
+  parameters:
+    lookback: 3
+  universe: ZZ9999
+reversal_william_support_5_ZZ9999:
+  classname: Price.WilliamSupport
+  parameters:
+    lookback: 5
+  universe: ZZ9999
+reversal_william_support_63_ZZ9999:
+  classname: Price.WilliamSupport
+  parameters:
+    lookback: 63
+  universe: ZZ9999
+reversal_william_support_1_ZZ9999:
+  classname: Price.WilliamSupport
+  parameters:
+    lookback: 1
+  universe: ZZ9999
+reversal_william_support_126_ZZ9999:
+  classname: Price.WilliamSupport
+  parameters:
+    lookback: 126
+  universe: ZZ9999
+reversal_william_support_252_ZZ9999:
+  classname: Price.WilliamSupport
+  parameters:
+    lookback: 252
+  universe: ZZ9999

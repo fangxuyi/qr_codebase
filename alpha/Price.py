@@ -793,3 +793,202 @@ class UpsideDownsideVol:
             pass
 
 
+class WilliamSupport:
+
+    """william support being support"""
+
+    def __init__(self, alpha_name, universe, parameter):
+        self.alpha_name = alpha_name
+        self.universe = universe
+        self.parameter = parameter
+        self.data_loader = DataLoader()
+
+    def calculate(self, date):
+        trade_dates = self.data_loader.get_all_trade_dates()
+        universe = self.data_loader.get_current_universe(date, self.universe)["code"].to_list()
+        try:
+            idx = trade_dates.index(date)
+            returns = self.data_loader.load_processed_window_list("pv_1min_standard",
+                                                                  trade_dates[idx - self.parameter["lookback"]:idx + 1],
+                                                                  ["code", "close", "low"])
+            returns["code"] = returns["code"].apply(lambda x: x.decode('utf-8'))
+            returns_close = returns.pivot_table(index="date", columns="code", values="close")
+            returns_close = returns_close.reindex(universe, axis=1).dropna(how="any", axis=1)
+            returns_low = returns.pivot_table(index="date", columns="code", values="low")
+            returns_low = returns_low.reindex(universe, axis=1).dropna(how="any", axis=1)
+            returns = returns_close - returns_low
+
+            returns_ranked = returns.rank(axis=1).rank(axis=0).tail(1).mean()
+            total_return_avg = returns_ranked.mean()
+            total_return_sum = returns_ranked.apply(lambda x: abs(x)).sum() / 2
+            weight = - (returns_ranked - total_return_avg) / total_return_sum
+            weight = pd.DataFrame(weight.rename("weight"))
+            weight["date"] = date
+            weight = weight.reset_index()
+            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name)
+
+        except:
+            pass
+
+
+class WilliamResistance:
+
+    """william resistance being resistance"""
+
+    def __init__(self, alpha_name, universe, parameter):
+        self.alpha_name = alpha_name
+        self.universe = universe
+        self.parameter = parameter
+        self.data_loader = DataLoader()
+
+    def calculate(self, date):
+        trade_dates = self.data_loader.get_all_trade_dates()
+        universe = self.data_loader.get_current_universe(date, self.universe)["code"].to_list()
+        try:
+            idx = trade_dates.index(date)
+            returns = self.data_loader.load_processed_window_list("pv_1min_standard",
+                                                                  trade_dates[idx - self.parameter["lookback"]:idx + 1],
+                                                                  ["code", "close", "high"])
+            returns["code"] = returns["code"].apply(lambda x: x.decode('utf-8'))
+            returns_close = returns.pivot_table(index="date", columns="code", values="close")
+            returns_close = returns_close.reindex(universe, axis=1).dropna(how="any", axis=1)
+            returns_high = returns.pivot_table(index="date", columns="code", values="high")
+            returns_high = returns_high.reindex(universe, axis=1).dropna(how="any", axis=1)
+            returns = returns_high - returns_close
+
+            returns_ranked = returns.rank(axis=1).rank(axis=0).tail(1).mean()
+            total_return_avg = returns_ranked.mean()
+            total_return_sum = returns_ranked.apply(lambda x: abs(x)).sum() / 2
+            weight = - (returns_ranked - total_return_avg) / total_return_sum
+            weight = pd.DataFrame(weight.rename("weight"))
+            weight["date"] = date
+            weight = weight.reset_index()
+            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name)
+
+        except:
+            pass
+
+
+class WilliamResistanceSupport:
+
+    """william resistance being resistance"""
+
+    def __init__(self, alpha_name, universe, parameter):
+        self.alpha_name = alpha_name
+        self.universe = universe
+        self.parameter = parameter
+        self.data_loader = DataLoader()
+
+    def calculate(self, date):
+        trade_dates = self.data_loader.get_all_trade_dates()
+        universe = self.data_loader.get_current_universe(date, self.universe)["code"].to_list()
+        try:
+            idx = trade_dates.index(date)
+            returns = self.data_loader.load_processed_window_list("pv_1min_standard",
+                                                                  trade_dates[idx - self.parameter["lookback"]:idx + 1],
+                                                                  ["code", "close", "high", "low"])
+            returns["code"] = returns["code"].apply(lambda x: x.decode('utf-8'))
+            returns_close = returns.pivot_table(index="date", columns="code", values="close")
+            returns_close = returns_close.reindex(universe, axis=1).dropna(how="any", axis=1)
+            returns_high = returns.pivot_table(index="date", columns="code", values="high")
+            returns_high = returns_high.reindex(universe, axis=1).dropna(how="any", axis=1)
+            returns_high = returns_high - returns_close
+            returns_low = returns.pivot_table(index="date", columns="code", values="low")
+            returns_low = returns_low.reindex(universe, axis=1).dropna(how="any", axis=1)
+            returns_low = returns_close - returns_low
+
+            returns_ranked = (returns_high / returns_low).rank(axis=1).rank(axis=0).tail(1).mean()
+            total_return_avg = returns_ranked.mean()
+            total_return_sum = returns_ranked.apply(lambda x: abs(x)).sum() / 2
+            weight = - (returns_ranked - total_return_avg) / total_return_sum
+            weight = pd.DataFrame(weight.rename("weight"))
+            weight["date"] = date
+            weight = weight.reset_index()
+            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name)
+
+        except:
+            pass
+
+
+class PositiveVolumeIndex:
+
+    """measuring herd behaviour"""
+
+    def __init__(self, alpha_name, universe, parameter):
+        self.alpha_name = alpha_name
+        self.universe = universe
+        self.parameter = parameter
+        self.data_loader = DataLoader()
+
+    def calculate(self, date):
+        trade_dates = self.data_loader.get_all_trade_dates()
+        universe = self.data_loader.get_current_universe(date, self.universe)["code"].to_list()
+        try:
+            idx = trade_dates.index(date)
+            returns = self.data_loader.load_processed_window_list("pv_1min_standard",
+                                                                  trade_dates[idx - self.parameter["lookback"]:idx + 1],
+                                                                  ["code", "close", "open", "daily_volume"])
+            returns["code"] = returns["code"].apply(lambda x: x.decode('utf-8'))
+            returns_volume = returns.pivot_table(index="date", columns="code", values="daily_volume")
+            returns_volume_diff = returns_volume.diff()
+            returns_close = returns.pivot_table(index="date", columns="code", values="close")
+            returns_close = returns_close.reindex(universe, axis=1).dropna(how="any", axis=1)
+            returns_open = returns.pivot_table(index="date", columns="code", values="open")
+            returns_open = returns_open.reindex(universe, axis=1).dropna(how="any", axis=1)
+            returns_otc = returns_close / returns_open - 1
+            returns_weighted = returns_volume[returns_volume_diff > 0].fillna(0) * returns_otc
+
+
+            returns_ranked = returns_weighted.sum() / returns_volume[returns_volume_diff > 0].mean()
+            total_return_avg = returns_ranked.mean()
+            total_return_sum = returns_ranked.apply(lambda x: abs(x)).sum() / 2
+            weight = - (returns_ranked - total_return_avg) / total_return_sum
+            weight = pd.DataFrame(weight.rename("weight"))
+            weight["date"] = date
+            weight = weight.reset_index()
+            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name)
+
+        except:
+            pass
+
+
+class NegativeVolumeIndex:
+
+    """measuring smart money behaviour"""
+
+    def __init__(self, alpha_name, universe, parameter):
+        self.alpha_name = alpha_name
+        self.universe = universe
+        self.parameter = parameter
+        self.data_loader = DataLoader()
+
+    def calculate(self, date):
+        trade_dates = self.data_loader.get_all_trade_dates()
+        universe = self.data_loader.get_current_universe(date, self.universe)["code"].to_list()
+        try:
+            idx = trade_dates.index(date)
+            returns = self.data_loader.load_processed_window_list("pv_1min_standard",
+                                                                  trade_dates[idx - self.parameter["lookback"]:idx + 1],
+                                                                  ["code", "close", "open", "daily_volume"])
+            returns["code"] = returns["code"].apply(lambda x: x.decode('utf-8'))
+            returns_volume = returns.pivot_table(index="date", columns="code", values="daily_volume")
+            returns_volume_diff = returns_volume.diff()
+            returns_close = returns.pivot_table(index="date", columns="code", values="close")
+            returns_close = returns_close.reindex(universe, axis=1).dropna(how="any", axis=1)
+            returns_open = returns.pivot_table(index="date", columns="code", values="open")
+            returns_open = returns_open.reindex(universe, axis=1).dropna(how="any", axis=1)
+            returns_otc = returns_close / returns_open - 1
+            returns_weighted = returns_volume[returns_volume_diff < 0].fillna(0) * returns_otc
+
+
+            returns_ranked = returns_weighted.sum() / returns_volume[returns_volume_diff < 0].mean()
+            total_return_avg = returns_ranked.mean()
+            total_return_sum = returns_ranked.apply(lambda x: abs(x)).sum() / 2
+            weight = - (returns_ranked - total_return_avg) / total_return_sum
+            weight = pd.DataFrame(weight.rename("weight"))
+            weight["date"] = date
+            weight = weight.reset_index()
+            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name)
+
+        except:
+            pass

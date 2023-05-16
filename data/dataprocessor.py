@@ -28,8 +28,11 @@ class DataProcessor:
         temp_names = args[0]
         temp_data_processors = args[1]
         temp_date = args[2]
-        print("running for " + str(temp_date) + " " + str(temp_names))
-        self.process(temp_data_processors, temp_date, temp_names)
+
+        try:
+            self.process(temp_data_processors, temp_date, temp_names)
+        except:
+            print("skipping for " + str(temp_date) + " " + str(temp_names))
 
     def process(self, pv_data_processors, date, names, pv_data="1min_PV"):
 

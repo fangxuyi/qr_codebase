@@ -26,3 +26,5 @@ if __name__ == '__main__':
     for arg in args_list:
         data_processor.process_with_args(arg)
 
+# TODO: ADD data validator and error handler
+

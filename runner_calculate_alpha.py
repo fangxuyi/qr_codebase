@@ -12,8 +12,7 @@ def merge(dict_list):
 
 
 config_file_names = [
-                     r"\intraday\reversal_without_intraday_extreme_value.yaml",
-                     r"\intraday\reversal_with_only_intraday_extreme_value.yaml",
+                     r"\daily\reversal_william_resistance_support.yaml",
                      ]
 
 if __name__ == '__main__':
