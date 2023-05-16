@@ -12,7 +12,8 @@ def merge(dict_list):
 
 
 config_file_names = [
-                     r"\daily\reversal_william_resistance_support.yaml",
+                     r"\daily\reversal_positive_volume_indicator.yaml",
+                     r"\daily\momentum_negative_volume_indicator.yaml",
                      ]
 
 if __name__ == '__main__':

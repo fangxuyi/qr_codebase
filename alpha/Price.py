@@ -939,7 +939,7 @@ class PositiveVolumeIndex:
             returns_weighted = returns_volume[returns_volume_diff > 0].fillna(0) * returns_otc
 
 
-            returns_ranked = returns_weighted.sum() / returns_volume[returns_volume_diff > 0].mean()
+            returns_ranked = returns_weighted.tail(1).sum() / returns_volume[returns_volume_diff > 0].mean()
             total_return_avg = returns_ranked.mean()
             total_return_sum = returns_ranked.apply(lambda x: abs(x)).sum() / 2
             weight = - (returns_ranked - total_return_avg) / total_return_sum
@@ -980,11 +980,10 @@ class NegativeVolumeIndex:
             returns_otc = returns_close / returns_open - 1
             returns_weighted = returns_volume[returns_volume_diff < 0].fillna(0) * returns_otc
 
-
-            returns_ranked = returns_weighted.sum() / returns_volume[returns_volume_diff < 0].mean()
+            returns_ranked = returns_weighted.tail(1).sum() / returns_volume[returns_volume_diff < 0].mean()
             total_return_avg = returns_ranked.mean()
             total_return_sum = returns_ranked.apply(lambda x: abs(x)).sum() / 2
-            weight = - (returns_ranked - total_return_avg) / total_return_sum
+            weight = (returns_ranked - total_return_avg) / total_return_sum
             weight = pd.DataFrame(weight.rename("weight"))
             weight["date"] = date
             weight = weight.reset_index()
