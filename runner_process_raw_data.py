@@ -16,8 +16,8 @@ if __name__ == '__main__':
     data_loader = DataLoader()
     dates = data_loader.get_trade_date_between(calc_start, calc_end)
 
-    names = ["pv_1min_intraday_volatility", "pv_1min_high_low_open_close_with_volume_ratio"]
-    data_processors = [intraday_volatility, minute_open_high_low_close_with_volume]
+    names = ["pv_1min_intraday_volatility", "pv_1min_intraday_pvi_nvi"]
+    data_processors = [intraday_volatility, intraday_pvi_nvi]
     data_processor = DataProcessor("multi", ReferenceDataLoader, RawDataLoader)
 
     args_list = []

@@ -61,6 +61,8 @@ def intraday_volatility(pv_data):
     pv_data["intraday_vol"] = pv_data["close"] / pv_data["open"] - 1
     pv_data["intraday_vol_up"] = pv_data["intraday_vol"].apply(lambda x: x if x > 0 else np.nan)
     pv_data["intraday_vol_down"] = pv_data["intraday_vol"].apply(lambda x: x if x < 0 else np.nan)
+    pv_data["intraday_return_up"] = pv_data["intraday_vol"].apply(lambda x: x if x > 0 else np.nan)
+    pv_data["intraday_return_down"] = pv_data["intraday_vol"].apply(lambda x: x if x < 0 else np.nan)
 
     return pv_data.groupby("code").agg({
         "open": "first",
@@ -68,6 +70,8 @@ def intraday_volatility(pv_data):
         "intraday_vol": std,
         "intraday_vol_up": std,
         "intraday_vol_down": std,
+        "intraday_return_up": "sum",
+        "intraday_return_down": "sum",
     })
 
 
@@ -141,6 +145,31 @@ def minute_open_high_low_close_with_volume(pv_data):
         "open": "first",
         "close": "last"
     })
+
+
+def intraday_pvi_nvi(pv_data):
+    """pv_1min_intraday_pvi_nvi"""
+
+    pv_data = pv_data.sort_values("time")
+
+    pv_data["open_time"] = pv_data["time"]
+    pv_data["close_time"] = pv_data["time"]
+    pv_data["prev_close"] = pv_data["pre_close"]
+    pv_data["open"] = pv_data["open"]
+    pv_data["high"] = pv_data["high"]
+    pv_data["low"] = pv_data["low"]
+    pv_data["close"] = pv_data["close"]
+    pv_data["volume"] = pv_data["volume"]
+    pv_data["return"] = pv_data["close"] / pv_data["open"] - 1
+
+    pv_data_volume = pv_data.pivot_table(index="time", columns="code", values="volume").fillna(0)
+    pv_data_volume = pv_data_volume.diff()
+
+    pv_data_return = pv_data.pivot_table(index="time", columns="code", values="return").fillna(0)
+    pv_data_return_upside = pv_data_return[pv_data_volume > 0].sum().rename("up_volume_return")
+    pv_data_return_downside = pv_data_return[pv_data_volume < 0].sum().rename("down_volume_return")
+
+    return pd.concat([pv_data_return_upside, pv_data_return_downside], axis=1)
 
 
 def big_small_turnover_direction(pv_data):

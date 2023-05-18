@@ -157,7 +157,7 @@ class MomentumChange:
             returns = returns.reindex(universe, axis=1).dropna(how="any", axis=1)
 
             momentum_change = ((returns + 1).tail(self.parameter["lookback"]).prod() - 1) - (
-                        (returns + 1).head(self.parameter["lookback"]).prod() - 1)
+                    (returns + 1).head(self.parameter["lookback"]).prod() - 1)
             total_return_avg = momentum_change.mean()
             total_return_sum = momentum_change.apply(lambda x: abs(x)).sum() / 2
             weight = (momentum_change - total_return_avg) / total_return_sum
@@ -236,7 +236,6 @@ class BinaryCount:
 
 
 class VolAdjMomentum:
-
     """large return should be more significant for low vol period: continuously moving up is more valuable"""
 
     def __init__(self, alpha_name, universe, parameter):
@@ -271,7 +270,6 @@ class VolAdjMomentum:
 
 
 class VolAdjTSMomentum:
-
     """time series variation adjusted by volatility: change in low vol period is more valuable"""
 
     def __init__(self, alpha_name, universe, parameter):
@@ -306,7 +304,6 @@ class VolAdjTSMomentum:
 
 
 class EWMAAdjMomentum:
-
     """recent price action is more valuable"""
 
     def __init__(self, alpha_name, universe, parameter):
@@ -321,7 +318,8 @@ class EWMAAdjMomentum:
         try:
             idx = trade_dates.index(date)
             returns = self.data_loader.load_processed_window_list("pv_1min_return",
-                                                                  trade_dates[idx - self.parameter["lookbackwindow"]:idx + 1])
+                                                                  trade_dates[
+                                                                  idx - self.parameter["lookbackwindow"]:idx + 1])
             returns["code"] = returns["code"].apply(lambda x: x.decode('utf-8'))
             returns = returns.pivot_table(index="date", columns="code", values="return")
             returns = returns.reindex(universe, axis=1).dropna(how="any", axis=1)
@@ -340,7 +338,6 @@ class EWMAAdjMomentum:
 
 
 class ExpandedTimeSeriesMomentum:
-
     """smooth out recent price movement noise"""
 
     def __init__(self, alpha_name, universe, parameter):
@@ -374,7 +371,6 @@ class ExpandedTimeSeriesMomentum:
 
 
 class OpenToCloseMomentum:
-
     """open to close should have better trending than close to close"""
 
     def __init__(self, alpha_name, universe, parameter):
@@ -390,8 +386,8 @@ class OpenToCloseMomentum:
             idx = trade_dates.index(date)
             returns = self.data_loader.load_processed_window_list("pv_1min_standard",
                                                                   trade_dates[idx - self.parameter["lookback"]:idx + 1],
-                                                                  ["open", "close", "code"]) #no cum_adjf for intraday
-            returns = returns.replace(0.,np.nan)
+                                                                  ["open", "close", "code"])  # no cum_adjf for intraday
+            returns = returns.replace(0., np.nan)
             returns["return"] = returns["close"] / returns["open"] - 1
             returns["code"] = returns["code"].apply(lambda x: x.decode('utf-8'))
             returns = returns.pivot_table(index="date", columns="code", values="return")
@@ -411,7 +407,6 @@ class OpenToCloseMomentum:
 
 
 class OpenToCloseMomentumWithVolumeFilter:
-
     """decreasing volume generates higher momentum?"""
 
     def __init__(self, alpha_name, universe, parameter):
@@ -454,7 +449,6 @@ class OpenToCloseMomentumWithVolumeFilter:
 
 
 class OpenToCloseMomentumWithVolumeCorr:
-
     """same direction movement in volume and price is bearish?"""
 
     def __init__(self, alpha_name, universe, parameter):
@@ -500,7 +494,6 @@ class OpenToCloseMomentumWithVolumeCorr:
 
 
 class OpenToCloseReversal:
-
     """this is only here because it worked empirically"""
 
     def __init__(self, alpha_name, universe, parameter):
@@ -516,8 +509,8 @@ class OpenToCloseReversal:
             idx = trade_dates.index(date)
             returns = self.data_loader.load_processed_window_list("pv_1min_standard",
                                                                   trade_dates[idx - self.parameter["lookback"]:idx + 1],
-                                                                  ["open", "close", "code"]) #no cum_adjf for intraday
-            returns = returns.replace(0.,np.nan)
+                                                                  ["open", "close", "code"])  # no cum_adjf for intraday
+            returns = returns.replace(0., np.nan)
             returns["return"] = returns["close"] / returns["open"] - 1
             returns["code"] = returns["code"].apply(lambda x: x.decode('utf-8'))
             returns = returns.pivot_table(index="date", columns="code", values="return")
@@ -537,7 +530,6 @@ class OpenToCloseReversal:
 
 
 class ConsistencyInIntradayPriceMovement:
-
     """gradual price movement might indicate a stronger trend"""
 
     def __init__(self, alpha_name, universe, parameter):
@@ -573,7 +565,6 @@ class ConsistencyInIntradayPriceMovement:
 
 
 class VolumeConsistency:
-
     """minute level price movement consistency weighted by volume"""
 
     def __init__(self, alpha_name, universe, parameter):
@@ -608,7 +599,6 @@ class VolumeConsistency:
 
 
 class TopBottomTradeReversal:
-
     """if largest trade and smallest trades are correspond to opposite price movement, top returns tend to be fake"""
 
     def __init__(self, alpha_name, universe, parameter):
@@ -643,7 +633,6 @@ class TopBottomTradeReversal:
 
 
 class ShortTermLowReversal:
-
     """minimum of low price over a few period of time. the lower the bigger chance of reversal"""
 
     def __init__(self, alpha_name, universe, parameter):
@@ -678,7 +667,6 @@ class ShortTermLowReversal:
 
 
 class ReversalWithoutExtremeValue:
-
     """price movement coming from market impact should be excluded"""
 
     def __init__(self, alpha_name, universe, parameter):
@@ -713,7 +701,6 @@ class ReversalWithoutExtremeValue:
 
 
 class ReversalWithOnlyExtremeValue:
-
     """price movement coming from market extreme value is driving return"""
 
     def __init__(self, alpha_name, universe, parameter):
@@ -735,9 +722,11 @@ class ReversalWithOnlyExtremeValue:
             returns = returns.reindex(universe, axis=1).dropna(how="any", axis=1)
 
             returns_all = self.data_loader.load_processed_window_list("pv_1min_standard",
-                                                                  trade_dates[idx - self.parameter["lookback"]:idx + 1],
-                                                                  ["open", "close", "code"]) #no cum_adjf for intraday
-            returns_all = returns_all.replace(0.,np.nan)
+                                                                      trade_dates[
+                                                                      idx - self.parameter["lookback"]:idx + 1],
+                                                                      ["open", "close",
+                                                                       "code"])  # no cum_adjf for intraday
+            returns_all = returns_all.replace(0., np.nan)
             returns_all["return"] = returns_all["close"] / returns_all["open"] - 1
             returns_all["code"] = returns_all["code"].apply(lambda x: x.decode('utf-8'))
             returns_all = returns_all.pivot_table(index="date", columns="code", values="return")
@@ -757,8 +746,8 @@ class ReversalWithOnlyExtremeValue:
         except:
             pass
 
-class UpsideDownsideVol:
 
+class UpsideDownsideVol:
     """upside downside vol shows momentum / reversal"""
 
     def __init__(self, alpha_name, universe, parameter):
@@ -793,8 +782,81 @@ class UpsideDownsideVol:
             pass
 
 
-class WilliamSupport:
+class LowestLowSupport:
+    """lowest low support"""
 
+    def __init__(self, alpha_name, universe, parameter):
+        self.alpha_name = alpha_name
+        self.universe = universe
+        self.parameter = parameter
+        self.data_loader = DataLoader()
+
+    def calculate(self, date):
+        trade_dates = self.data_loader.get_all_trade_dates()
+        universe = self.data_loader.get_current_universe(date, self.universe)["code"].to_list()
+        try:
+            idx = trade_dates.index(date)
+            returns = self.data_loader.load_processed_window_list("pv_1min_standard",
+                                                                  trade_dates[idx - self.parameter["lookback"]:idx + 1],
+                                                                  ["code", "close", "low"])
+            returns["code"] = returns["code"].apply(lambda x: x.decode('utf-8'))
+            returns_close = returns.pivot_table(index="date", columns="code", values="close")
+            returns_close = returns_close.reindex(universe, axis=1).dropna(how="any", axis=1)
+            returns_low = returns.pivot_table(index="date", columns="code", values="low")
+            returns_low = returns_low.reindex(universe, axis=1).dropna(how="any", axis=1)
+
+            returns_ranked = (returns_low.min() / returns_close.tail(1).mean()).rank()
+            total_return_avg = returns_ranked.mean()
+            total_return_sum = returns_ranked.apply(lambda x: abs(x)).sum() / 2
+            weight = - (returns_ranked - total_return_avg) / total_return_sum
+            weight = pd.DataFrame(weight.rename("weight"))
+            weight["date"] = date
+            weight = weight.reset_index()
+            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name)
+
+        except:
+            pass
+
+
+class RSV:
+    """see where the price is relatively"""
+
+    def __init__(self, alpha_name, universe, parameter):
+        self.alpha_name = alpha_name
+        self.universe = universe
+        self.parameter = parameter
+        self.data_loader = DataLoader()
+
+    def calculate(self, date):
+        trade_dates = self.data_loader.get_all_trade_dates()
+        universe = self.data_loader.get_current_universe(date, self.universe)["code"].to_list()
+        try:
+            idx = trade_dates.index(date)
+            returns = self.data_loader.load_processed_window_list("pv_1min_standard",
+                                                                  trade_dates[idx - self.parameter["lookback"]:idx + 1],
+                                                                  ["code", "close", "low", "high"])
+            returns["code"] = returns["code"].apply(lambda x: x.decode('utf-8'))
+            returns_close = returns.pivot_table(index="date", columns="code", values="close")
+            returns_close = returns_close.reindex(universe, axis=1).dropna(how="any", axis=1)
+            returns_low = returns.pivot_table(index="date", columns="code", values="low")
+            returns_low = returns_low.reindex(universe, axis=1).dropna(how="any", axis=1)
+            returns_high = returns.pivot_table(index="date", columns="code", values="high")
+            returns_high = returns_high.reindex(universe, axis=1).dropna(how="any", axis=1)
+
+            returns_ranked = ((returns_close.tail(1).mean() - returns_low.min()) / (returns_high.min() - returns_low.min())).rank()
+            total_return_avg = returns_ranked.mean()
+            total_return_sum = returns_ranked.apply(lambda x: abs(x)).sum() / 2
+            weight = - (returns_ranked - total_return_avg) / total_return_sum
+            weight = pd.DataFrame(weight.rename("weight"))
+            weight["date"] = date
+            weight = weight.reset_index()
+            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name)
+
+        except:
+            pass
+
+
+class WilliamSupport:
     """william support being support"""
 
     def __init__(self, alpha_name, universe, parameter):
@@ -830,9 +892,7 @@ class WilliamSupport:
         except:
             pass
 
-
 class WilliamResistance:
-
     """william resistance being resistance"""
 
     def __init__(self, alpha_name, universe, parameter):
@@ -870,7 +930,6 @@ class WilliamResistance:
 
 
 class WilliamResistanceSupport:
-
     """william resistance being resistance"""
 
     def __init__(self, alpha_name, universe, parameter):
@@ -897,7 +956,8 @@ class WilliamResistanceSupport:
             returns_low = returns_low.reindex(universe, axis=1).dropna(how="any", axis=1)
             returns_low = returns_close - returns_low
 
-            returns_ranked = (returns_high / returns_low).rank(axis=1).rank(axis=0).tail(1).mean()
+            returns_ranked = returns_low.rank(axis=1).rank(axis=0).tail(1).mean() + returns_high.rank(axis=1).rank(
+                axis=0).tail(1).mean()
             total_return_avg = returns_ranked.mean()
             total_return_sum = returns_ranked.apply(lambda x: abs(x)).sum() / 2
             weight = - (returns_ranked - total_return_avg) / total_return_sum
@@ -911,7 +971,6 @@ class WilliamResistanceSupport:
 
 
 class PositiveVolumeIndex:
-
     """measuring herd behaviour"""
 
     def __init__(self, alpha_name, universe, parameter):
@@ -938,8 +997,8 @@ class PositiveVolumeIndex:
             returns_otc = returns_close / returns_open - 1
             returns_weighted = returns_volume[returns_volume_diff > 0].fillna(0) * returns_otc
 
-
-            returns_ranked = returns_weighted.tail(1).sum() / returns_volume[returns_volume_diff > 0].mean()
+            returns_ranked = (returns_weighted.tail(1).sum() / returns_volume[returns_volume_diff > 0].mean()).rank(
+                axis=0)
             total_return_avg = returns_ranked.mean()
             total_return_sum = returns_ranked.apply(lambda x: abs(x)).sum() / 2
             weight = - (returns_ranked - total_return_avg) / total_return_sum
@@ -953,7 +1012,6 @@ class PositiveVolumeIndex:
 
 
 class NegativeVolumeIndex:
-
     """measuring smart money behaviour"""
 
     def __init__(self, alpha_name, universe, parameter):
@@ -980,7 +1038,8 @@ class NegativeVolumeIndex:
             returns_otc = returns_close / returns_open - 1
             returns_weighted = returns_volume[returns_volume_diff < 0].fillna(0) * returns_otc
 
-            returns_ranked = returns_weighted.tail(1).sum() / returns_volume[returns_volume_diff < 0].mean()
+            returns_ranked = (returns_weighted.tail(1).sum() / returns_volume[returns_volume_diff < 0].mean()).rank(
+                axis=0)
             total_return_avg = returns_ranked.mean()
             total_return_sum = returns_ranked.apply(lambda x: abs(x)).sum() / 2
             weight = (returns_ranked - total_return_avg) / total_return_sum
@@ -991,3 +1050,142 @@ class NegativeVolumeIndex:
 
         except:
             pass
+
+
+class IntradayStrength:
+    """intraday down return as a percentage of both"""
+
+    def __init__(self, alpha_name, universe, parameter):
+        self.alpha_name = alpha_name
+        self.universe = universe
+        self.parameter = parameter
+        self.data_loader = DataLoader()
+
+    def calculate(self, date):
+        trade_dates = self.data_loader.get_all_trade_dates()
+        universe = self.data_loader.get_current_universe(date, self.universe)["code"].to_list()
+        try:
+            idx = trade_dates.index(date)
+            returns = self.data_loader.load_processed_window_list("pv_1min_intraday_volatility",
+                                                                  trade_dates[idx - self.parameter["lookback"]:idx + 1],
+                                                                  ["code", "intraday_return_up", "intraday_return_down"])
+            returns["code"] = returns["code"].apply(lambda x: x.decode('utf-8'))
+            returns_up = returns.pivot_table(index="date", columns="code", values="intraday_return_up")
+            returns_up = returns_up.reindex(universe, axis=1).dropna(how="any", axis=1)
+            returns_down = returns.pivot_table(index="date", columns="code", values="intraday_return_down")
+            returns_down = returns_down.reindex(universe, axis=1).dropna(how="any", axis=1)
+            returns_diff = - returns_down / (returns_up - returns_down)
+
+            returns_ranked = returns_diff.mean()
+            total_return_avg = returns_ranked.mean()
+            total_return_sum = returns_ranked.apply(lambda x: abs(x)).sum() / 2
+            weight = (returns_ranked - total_return_avg) / total_return_sum
+            weight = pd.DataFrame(weight.rename("weight"))
+            weight["date"] = date
+            weight = weight.reset_index()
+            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name)
+
+        except:
+            pass
+
+
+class VWAPReversal:
+    """reserval coming from VWAP"""
+    def __init__(self, alpha_name, universe, parameter):
+        self.alpha_name = alpha_name
+        self.universe = universe
+        self.parameter = parameter
+        self.data_loader = DataLoader()
+
+    def calculate(self, date):
+        trade_dates = self.data_loader.get_all_trade_dates()
+        universe = self.data_loader.get_current_universe(date, self.universe)["code"].to_list()
+        try:
+            idx = trade_dates.index(date)
+            returns = self.data_loader.load_processed_window_list("pv_1min_daily_vwap",
+                                                                  trade_dates[idx - self.parameter["lookback"]:idx + 1],
+                                                                  ["code", "weighted_avg_return"])
+            returns["code"] = returns["code"].apply(lambda x: x.decode('utf-8'))
+            returns = returns.pivot_table(index="date", columns="code", values="weighted_avg_return")
+            returns = returns.reindex(universe, axis=1).dropna(how="any", axis=1)
+
+            total_return = (returns + 1).prod() - 1
+            total_return_avg = total_return.mean()
+            total_return_sum = total_return.apply(lambda x: abs(x)).sum() / 2
+            weight = - (total_return - total_return_avg) / total_return_sum
+            weight = pd.DataFrame(weight.rename("weight"))
+            weight["date"] = date
+            weight = weight.reset_index()
+            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name)
+
+        except:
+            pass
+
+
+class IntradayPositiveVolumeIndex:
+    """measuring herd behaviour"""
+
+    def __init__(self, alpha_name, universe, parameter):
+        self.alpha_name = alpha_name
+        self.universe = universe
+        self.parameter = parameter
+        self.data_loader = DataLoader()
+
+    def calculate(self, date):
+        trade_dates = self.data_loader.get_all_trade_dates()
+        universe = self.data_loader.get_current_universe(date, self.universe)["code"].to_list()
+        try:
+            idx = trade_dates.index(date)
+            returns = self.data_loader.load_processed_window_list("pv_1min_intraday_pvi_nvi",
+                                                                  trade_dates[idx - self.parameter["lookback"]:idx + 1],
+                                                                  ["code", "up_volume_return"])
+            returns["code"] = returns["code"].apply(lambda x: x.decode('utf-8'))
+            returns = returns.pivot_table(index="date", columns="code", values="up_volume_return")
+            returns = returns.reindex(universe, axis=1).dropna(how="any", axis=1)
+
+            returns_ranked = returns.mean()
+            total_return_avg = returns_ranked.mean()
+            total_return_sum = returns_ranked.apply(lambda x: abs(x)).sum() / 2
+            weight = - (returns_ranked - total_return_avg) / total_return_sum
+            weight = pd.DataFrame(weight.rename("weight"))
+            weight["date"] = date
+            weight = weight.reset_index()
+            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name)
+
+        except:
+            pass
+
+
+class IntradayNegativeVolumeIndex:
+    """measuring smart money behaviour"""
+
+    def __init__(self, alpha_name, universe, parameter):
+        self.alpha_name = alpha_name
+        self.universe = universe
+        self.parameter = parameter
+        self.data_loader = DataLoader()
+
+    def calculate(self, date):
+        trade_dates = self.data_loader.get_all_trade_dates()
+        universe = self.data_loader.get_current_universe(date, self.universe)["code"].to_list()
+        try:
+            idx = trade_dates.index(date)
+            returns = self.data_loader.load_processed_window_list("pv_1min_intraday_pvi_nvi",
+                                                                  trade_dates[idx - self.parameter["lookback"]:idx + 1],
+                                                                  ["code", "down_volume_return"])
+            returns["code"] = returns["code"].apply(lambda x: x.decode('utf-8'))
+            returns = returns.pivot_table(index="date", columns="code", values="down_volume_return")
+            returns = returns.reindex(universe, axis=1).dropna(how="any", axis=1)
+
+            returns_ranked = returns.mean()
+            total_return_avg = returns_ranked.mean()
+            total_return_sum = returns_ranked.apply(lambda x: abs(x)).sum() / 2
+            weight = - (returns_ranked - total_return_avg) / total_return_sum
+            weight = pd.DataFrame(weight.rename("weight"))
+            weight["date"] = date
+            weight = weight.reset_index()
+            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name)
+
+        except:
+            pass
+

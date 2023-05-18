@@ -11,8 +11,10 @@ def merge(dict_list):
     return output
 
 config_file_names = [
-                     r"\daily\reversal_positive_volume_indicator.yaml",
-                     r"\daily\momentum_negative_volume_indicator.yaml",
+                     r"\intraday\intraday_negative_volume.yaml",
+                     r"\daily\reversal_william_resistance_support.yaml",
+                     r"\intraday\intraday_strength.yaml",
+                     r"\intraday\reversal_vwap.yaml",
                      ]
 alpha_perfmc_cfg_list = merge([load_config_yaml(config) for config in config_file_names])
 

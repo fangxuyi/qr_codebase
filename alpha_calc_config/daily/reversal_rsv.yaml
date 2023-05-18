@@ -1,0 +1,40 @@
+reversal_rsv_10_ZZ9999:
+  classname: Price.RSV
+  parameters:
+    lookback: 10
+  universe: ZZ9999
+reversal_rsv_21_ZZ9999:
+  classname: Price.RSV
+  parameters:
+    lookback: 21
+  universe: ZZ9999
+reversal_rsv_3_ZZ9999:
+  classname: Price.RSV
+  parameters:
+    lookback: 3
+  universe: ZZ9999
+reversal_rsv_5_ZZ9999:
+  classname: Price.RSV
+  parameters:
+    lookback: 5
+  universe: ZZ9999
+reversal_rsv_63_ZZ9999:
+  classname: Price.RSV
+  parameters:
+    lookback: 63
+  universe: ZZ9999
+reversal_rsv_1_ZZ9999:
+  classname: Price.RSV
+  parameters:
+    lookback: 1
+  universe: ZZ9999
+reversal_rsv_126_ZZ9999:
+  classname: Price.RSV
+  parameters:
+    lookback: 126
+  universe: ZZ9999
+reversal_rsv_252_ZZ9999:
+  classname: Price.RSV
+  parameters:
+    lookback: 252
+  universe: ZZ9999

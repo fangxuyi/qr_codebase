@@ -1,0 +1,40 @@
+intraday_strength_10_ZZ9999:
+  classname: Price.IntradayStrength
+  parameters:
+    lookback: 10
+  universe: ZZ9999
+intraday_strength_21_ZZ9999:
+  classname: Price.IntradayStrength
+  parameters:
+    lookback: 21
+  universe: ZZ9999
+intraday_strength_5_ZZ9999:
+  classname: Price.IntradayStrength
+  parameters:
+    lookback: 5
+  universe: ZZ9999
+intraday_strength_63_ZZ9999:
+  classname: Price.IntradayStrength
+  parameters:
+    lookback: 63
+  universe: ZZ9999
+intraday_strength_1_ZZ9999:
+  classname: Price.IntradayStrength
+  parameters:
+    lookback: 1
+  universe: ZZ9999
+intraday_strength_2_ZZ9999:
+  classname: Price.IntradayStrength
+  parameters:
+    lookback: 2
+  universe: ZZ9999
+intraday_strength_3_ZZ9999:
+  classname: Price.IntradayStrength
+  parameters:
+    lookback: 3
+  universe: ZZ9999
+intraday_strength_126_ZZ9999:
+  classname: Price.IntradayStrength
+  parameters:
+    lookback: 126
+  universe: ZZ9999

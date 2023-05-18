@@ -1,0 +1,35 @@
+vwap_reversal_10_ZZ9999:
+  classname: Price.VWAPReversal
+  parameters:
+    lookback: 10
+  universe: ZZ9999
+vwap_reversal_21_ZZ9999:
+  classname: Price.VWAPReversal
+  parameters:
+    lookback: 21
+  universe: ZZ9999
+vwap_reversal_3_ZZ9999:
+  classname: Price.VWAPReversal
+  parameters:
+    lookback: 3
+  universe: ZZ9999
+vwap_reversal_5_ZZ9999:
+  classname: Price.VWAPReversal
+  parameters:
+    lookback: 5
+  universe: ZZ9999
+vwap_reversal_63_ZZ9999:
+  classname: Price.VWAPReversal
+  parameters:
+    lookback: 63
+  universe: ZZ9999
+vwap_reversal_1_ZZ9999:
+  classname: Price.VWAPReversal
+  parameters:
+    lookback: 1
+  universe: ZZ9999
+vwap_reversal_126_ZZ9999:
+  classname: Price.VWAPReversal
+  parameters:
+    lookback: 126
+  universe: ZZ9999
