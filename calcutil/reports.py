@@ -26,6 +26,15 @@ from datetime import (
     datetime as _dt
 )
 from base64 import b64encode as _b64encode
+import matplotlib.pyplot as _plt
+try:
+    _plt.rcParams["font.family"] = "Arial"
+except Exception:
+    pass
+from matplotlib.ticker import (
+    FormatStrFormatter as _FormatStrFormatter,
+    FuncFormatter as _FuncFormatter
+)
 import re as _regex
 from tabulate import tabulate as _tabulate
 from quantstats import (
@@ -58,198 +67,91 @@ def _match_dates(returns, benchmark):
     return returns, benchmark
 
 
-#over-written charting methods
-def plot_returns(returns, benchmark=None,title="Returns",
-            grayscale=False, figsize=(10, 6),
-            fontname='Arial', lw=1.5,
-            match_volatility=False, compound=True, cumulative=True,
-            resample=None, ylabel="Cumulative Returns",
-            subtitle=True, savefig=None, show=True):
-
-    fig = _core.plot_timeseries(returns, benchmark, title,
-                                ylabel=ylabel,
-                                match_volatility=match_volatility,
-                                log_scale=False,
-                                resample=resample,
-                                compound=compound,
-                                cumulative=cumulative,
-                                lw=lw,
-                                figsize=figsize,
-                                fontname=fontname,
-                                grayscale=grayscale,
-                                subtitle=subtitle,
-                                savefig=savefig, show=show)
-    return fig
-
-
-def yearly_returns(returns, title, benchmark=None,
-                   fontname='Arial', grayscale=False,
-                   hlw=1.5, hlcolor="red", hllabel="",
-                   match_volatility=False,
-                   log_scale=False, figsize=(10, 5), ylabel=True,
-                   subtitle=True, compounded=True,
-                   savefig=None, show=True,
-                   prepare_returns=True):
-
-    if benchmark is not None:
-        title += '  vs Benchmark'
-        benchmark = _utils._prepare_benchmark(
-            benchmark, returns.index).resample('A').apply(
-                _stats.comp).resample('A').last()
-
-    if prepare_returns:
-        returns = _utils._prepare_returns(returns)
-
-    if compounded:
-        returns = returns.resample('A').apply(_stats.comp)
-    else:
-        returns = returns.resample('A').apply(_df.sum)
-    returns = returns.resample('A').last()
-
-    fig = _core.plot_returns_bars(returns, benchmark,
-                                  fontname=fontname,
-                                  hline=returns.mean(),
-                                  hlw=hlw,
-                                  hllabel=hllabel,
-                                  hlcolor=hlcolor,
-                                  match_volatility=match_volatility,
-                                  log_scale=log_scale,
-                                  resample=None,
-                                  title=title,
-                                  figsize=figsize,
-                                  grayscale=grayscale,
-                                  ylabel=ylabel,
-                                  subtitle=subtitle,
-                                  savefig=savefig, show=show)
-    if not show:
-        return fig
-
-
-def histogram(returns, resample='M', fontname='Arial',
-              grayscale=False, figsize=(10, 5), ylabel=True,
-              subtitle=True, compounded=True, savefig=None, show=True,
-              prepare_returns=True):
-
-    if prepare_returns:
-        returns = _utils._prepare_returns(returns)
-
-    if resample == 'W':
-        title = "Weekly "
-    elif resample == 'M':
-        title = "Monthly "
-    elif resample == 'Q':
-        title = "Quarterly "
-    elif resample == 'A':
-        title = "Annual "
-    else:
-        title = ""
-
-    return _core.plot_histogram(returns,
-                                resample=resample,
-                                grayscale=grayscale,
-                                fontname=fontname,
-                                title="Distribution of %sLongside Returns" % title,
-                                figsize=figsize,
-                                ylabel=ylabel,
-                                subtitle=subtitle,
-                                compounded=compounded,
-                                savefig=savefig, show=show)
-
-
-def rolling_volatility(returns, benchmark=None,
-                       period=126, period_label="6-Months",
-                       periods_per_year=252,
-                       lw=1.5, fontname='Arial', grayscale=False,
-                       figsize=(10, 3), ylabel="Volatility",
-                       subtitle=True, savefig=None, show=True):
-
-    returns = _stats.rolling_volatility(returns, period, periods_per_year)
-
-    if benchmark is not None:
-        benchmark = _utils._prepare_benchmark(benchmark, returns.index)
-        benchmark = _stats.rolling_volatility(
-            benchmark, period, periods_per_year, prepare_returns=False)
-
-    fig = _core.plot_rolling_stats(returns, benchmark,
-                                   hline=returns.mean(),
-                                   hlw=1.5,
-                                   ylabel=ylabel,
-                                   title='Longside Rolling Volatility (%s)' % period_label,
-                                   fontname=fontname,
-                                   grayscale=grayscale,
-                                   lw=lw,
-                                   figsize=figsize,
-                                   subtitle=subtitle,
-                                   savefig=savefig, show=show)
-    if not show:
-        return fig
-
-
-def rolling_sharpe(returns, benchmark=None, rf=0.,
-                   period=126, period_label="6-Months",
-                   periods_per_year=252,
-                   lw=1.25, fontname='Arial', grayscale=False,
-                   figsize=(10, 3), ylabel="Sharpe",
-                   subtitle=True, savefig=None, show=True):
-
-    returns = _stats.rolling_sharpe(
-        returns, rf, period, True, periods_per_year, )
-
-    if benchmark is not None:
-        benchmark = _utils._prepare_benchmark(benchmark, returns.index, rf)
-        benchmark = _stats.rolling_sharpe(
-            benchmark, rf, period, True, periods_per_year,
-            prepare_returns=False)
-
-    fig = _core.plot_rolling_stats(returns, benchmark,
-                                   hline=returns.mean(),
-                                   hlw=1.5,
-                                   ylabel=ylabel,
-                                   title='Longside Rolling Sharpe (%s)' % period_label,
-                                   fontname=fontname,
-                                   grayscale=grayscale,
-                                   lw=lw,
-                                   figsize=figsize,
-                                   subtitle=subtitle,
-                                   savefig=savefig, show=show)
-    if not show:
-        return fig
-
-
-def rolling_sortino(returns, benchmark=None, rf=0.,
-                    period=126, period_label="6-Months",
-                    periods_per_year=252,
-                    lw=1.25, fontname='Arial', grayscale=False,
-                    figsize=(10, 3), ylabel="Sortino",
+def plot_timeseries(returns, all_returns,
+                    title="Returns", returns_label="Delay 1",
+                    percent=True, lw=1.5, figsize=(10, 6), ylabel="",
+                    grayscale=False, fontname="Arial",
                     subtitle=True, savefig=None, show=True):
 
-    returns = _stats.rolling_sortino(
-        returns, rf, period, True, periods_per_year)
+    colors, ls, alpha = _core._get_colors(grayscale)
+    returns.fillna(0, inplace=True)
+    returns = returns.cumsum()
 
-    if benchmark is not None:
-        benchmark = _utils._prepare_benchmark(benchmark, returns.index, rf)
-        benchmark = _stats.rolling_sortino(
-            benchmark, rf, period, True, periods_per_year,
-            prepare_returns=False)
+    fig, ax = _plt.subplots(figsize=figsize)
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['bottom'].set_visible(False)
+    ax.spines['left'].set_visible(False)
 
-    fig = _core.plot_rolling_stats(returns, benchmark,
-                                   hline=returns.mean(),
-                                   hlw=1.5,
-                                   ylabel=ylabel,
-                                   title='Longside Rolling Sortino (%s)' % period_label,
-                                   fontname=fontname,
-                                   grayscale=grayscale,
-                                   lw=lw,
-                                   figsize=figsize,
-                                   subtitle=subtitle,
-                                   savefig=savefig, show=show)
+    fig.suptitle(title+"\n", y=.99, fontweight="bold", fontname=fontname,
+                 fontsize=14, color="black")
+
+    if subtitle:
+        ax.set_title("\n%s - %s                  " % (
+            returns.index.date[:1][0].strftime('%e %b \'%y'),
+            returns.index.date[-1:][0].strftime('%e %b \'%y')
+        ), fontsize=12, color='gray')
+
+    fig.set_facecolor('white')
+    ax.set_facecolor('white')
+
+    alpha = .25 if grayscale else 1
+    ax.plot(returns, lw=lw, label=returns_label, color=colors[0], alpha=alpha)
+
+    color_indicator = 1
+    all_returns = all_returns.cumsum()
+    for col in all_returns:
+        ax.plot(all_returns[col], lw=lw, label=col, color=colors[color_indicator], alpha=alpha)
+        color_indicator += 1
+
+    # rotate and align the tick labels so they look better
+    fig.autofmt_xdate()
+
+    ax.axhline(0, ls="-", lw=1,
+               color='gray', zorder=1)
+    ax.axhline(0, ls="--", lw=1,
+               color='white' if grayscale else 'black', zorder=2)
+    ax.legend()
+
+    if percent:
+        ax.yaxis.set_major_formatter(_FuncFormatter(_core.format_pct_axis))
+
+    ax.set_xlabel('')
+    if ylabel:
+        ax.set_ylabel(ylabel, fontname=fontname,
+                      fontweight='bold', fontsize=12, color="black")
+    ax.yaxis.set_label_coords(-.1, .5)
+
+    try:
+        _plt.subplots_adjust(hspace=0, bottom=0, top=1)
+    except Exception:
+        pass
+
+    try:
+        fig.tight_layout()
+    except Exception:
+        pass
+
+    if savefig:
+        if isinstance(savefig, dict):
+            _plt.savefig(**savefig)
+        else:
+            _plt.savefig(savefig)
+
+    if show:
+        _plt.show(block=False)
+
+    _plt.close()
+
     if not show:
         return fig
 
+    return None
 
-def html(returns, rf=0., grayscale=False,
-         title='Other Metrics', output=None, compounded=True,
-         periods_per_year=252, download_filename='other_metric_report.html',
+
+def html(returns, all_returns, benchmark=None, rf=0., grayscale=False,
+         title='Strategy Tearsheet', output=None, compounded=True,
+         periods_per_year=252, download_filename='quantstats-tearsheet.html',
          figfmt='svg', template_path=None, match_dates=False, **kwargs):
 
     if output is None and not _utils._in_notebook():
@@ -258,21 +160,19 @@ def html(returns, rf=0., grayscale=False,
     win_year, win_half_year = _get_trading_periods(periods_per_year)
 
     tpl = ""
-    with open(template_path or __file__[:-3] + '.html') as f:
+    with open(template_path or __file__[:-4] + '.html') as f:
         tpl = f.read()
         f.close()
 
     # prepare timeseries
-    turnover = returns["turnover"]
-    longside_return = returns["longside_return"]
-    shortside_return = returns["shortside_return"]
+    returns = _utils._prepare_returns(returns)
 
     date_range = returns.index.strftime('%e %b, %Y')
     tpl = tpl.replace('{{date_range}}', date_range[0] + ' - ' + date_range[-1])
     tpl = tpl.replace('{{title}}', title)
     tpl = tpl.replace('{{v}}', __version__)
 
-    mtrx = metrics(returns=longside_return, benchmark=None,
+    mtrx = metrics(returns=returns, benchmark=benchmark,
                    rf=rf, display=False, mode='full',
                    sep=True, internal="True",
                    compounded=compounded,
@@ -288,10 +188,10 @@ def html(returns, rf=0., grayscale=False,
 
     # pct multiplier
     yoy = _pd.DataFrame(
-        _utils.group_returns(longside_return, longside_return.index.year) * 100)
+        _utils.group_returns(returns, returns.index.year) * 100)
     yoy.columns = ['Return']
     yoy['Cumulative'] = _utils.group_returns(
-        longside_return, longside_return.index.year, True)
+        returns, returns.index.year, True)
     yoy['Return'] = yoy['Return'].round(2).astype(str) + '%'
     yoy['Cumulative'] = (yoy['Cumulative'] *
                          100).round(2).astype(str) + '%'
@@ -299,7 +199,7 @@ def html(returns, rf=0., grayscale=False,
     tpl = tpl.replace('{{eoy_title}}', '<h3>EOY Returns</h3>')
     tpl = tpl.replace('{{eoy_table}}', _html_table(yoy))
 
-    dd = _stats.to_drawdown_series(longside_return)
+    dd = _stats.to_drawdown_series(returns)
     dd_info = _stats.drawdown_details(dd).sort_values(
         by='max drawdown', ascending=True)[:10]
 
@@ -308,81 +208,99 @@ def html(returns, rf=0., grayscale=False,
     tpl = tpl.replace('{{dd_info}}', _html_table(dd_info, False))
 
     # plots
+    figfile = _utils._file_stream()
+    plot_timeseries(returns, all_returns,
+                    title="Cumulative Returns", returns_label="delay 1",
+                    percent=True, lw=1.5, figsize=(10, 6), ylabel="",
+                    grayscale=False, fontname="Arial",
+                    subtitle=False, savefig={'fname': figfile, 'format': figfmt}, show=True)
+    tpl = tpl.replace('{{returns}}', _embed_figure(figfile, figfmt))
 
     figfile = _utils._file_stream()
-    plot_returns(turnover, None, title="Turnover", grayscale=grayscale,
+    _plots.log_returns(returns, benchmark, grayscale=grayscale,
                        figsize=(8, 4), subtitle=False,
                        savefig={'fname': figfile, 'format': figfmt},
-                       show=False, ylabel=False, cumulative=compounded)
-    tpl = tpl.replace('{{turnover}}', _embed_figure(figfile, figfmt))
+                       show=False, ylabel=False, cumulative=compounded,
+                       prepare_returns=False)
+    tpl = tpl.replace('{{log_returns}}', _embed_figure(figfile, figfmt))
 
     figfile = _utils._file_stream()
-    plot_returns(longside_return, None, title="Longside_Return", grayscale=grayscale,
-                       figsize=(8, 4), subtitle=False,
-                       savefig={'fname': figfile, 'format': figfmt},
-                       show=False, ylabel=False, cumulative=compounded)
-    tpl = tpl.replace('{{long_return}}', _embed_figure(figfile, figfmt))
+    _plots.yearly_returns(returns, benchmark, grayscale=grayscale,
+                          figsize=(8, 4), subtitle=False,
+                          savefig={'fname': figfile, 'format': figfmt},
+                          show=False, ylabel=False, compounded=compounded,
+                          prepare_returns=False)
+    tpl = tpl.replace('{{eoy_returns}}', _embed_figure(figfile, figfmt))
 
     figfile = _utils._file_stream()
-    plot_returns(shortside_return, None, title="Shortside_Return", grayscale=grayscale,
-                       figsize=(8, 4), subtitle=False,
-                       savefig={'fname': figfile, 'format': figfmt},
-                       show=False, ylabel=False, cumulative=compounded)
-    tpl = tpl.replace('{{short_return}}', _embed_figure(figfile, figfmt))
+    _plots.histogram(returns, grayscale=grayscale,
+                     figsize=(8, 4), subtitle=False,
+                     savefig={'fname': figfile, 'format': figfmt},
+                     show=False, ylabel=False, compounded=compounded,
+                     prepare_returns=False)
+    tpl = tpl.replace('{{monthly_dist}}', _embed_figure(figfile, figfmt))
 
     figfile = _utils._file_stream()
-    rolling_volatility(longside_return, None, grayscale=grayscale,
+    _plots.daily_returns(returns, grayscale=grayscale,
+                         figsize=(8, 3), subtitle=False,
+                         savefig={'fname': figfile, 'format': figfmt},
+                         show=False, ylabel=False,
+                         prepare_returns=False)
+    tpl = tpl.replace('{{daily_returns}}', _embed_figure(figfile, figfmt))
+
+    figfile = _utils._file_stream()
+    _plots.rolling_volatility(returns, benchmark, grayscale=grayscale,
                               figsize=(8, 3), subtitle=False,
                               savefig={'fname': figfile, 'format': figfmt},
                               show=False, ylabel=False, period=win_half_year,
                               periods_per_year=win_year)
-    tpl = tpl.replace('{{rolling_vol_long}}', _embed_figure(figfile, figfmt))
+    tpl = tpl.replace('{{rolling_vol}}', _embed_figure(figfile, figfmt))
 
     figfile = _utils._file_stream()
-    rolling_sharpe(longside_return, grayscale=grayscale,
+    _plots.rolling_sharpe(returns, grayscale=grayscale,
                           figsize=(8, 3), subtitle=False,
                           savefig={'fname': figfile, 'format': figfmt},
                           show=False, ylabel=False, period=win_half_year,
                           periods_per_year=win_year)
-    tpl = tpl.replace('{{rolling_sharpe_long}}', _embed_figure(figfile, figfmt))
+    tpl = tpl.replace('{{rolling_sharpe}}', _embed_figure(figfile, figfmt))
 
     figfile = _utils._file_stream()
-    rolling_sortino(longside_return, grayscale=grayscale,
+    _plots.rolling_sortino(returns, grayscale=grayscale,
                            figsize=(8, 3), subtitle=False,
                            savefig={'fname': figfile, 'format': figfmt},
                            show=False, ylabel=False, period=win_half_year,
                            periods_per_year=win_year)
-    tpl = tpl.replace('{{rolling_sortino_long}}', _embed_figure(figfile, figfmt))
+    tpl = tpl.replace('{{rolling_sortino}}', _embed_figure(figfile, figfmt))
 
     figfile = _utils._file_stream()
-    _plots.drawdowns_periods(longside_return, grayscale=grayscale,
+    _plots.drawdowns_periods(returns, grayscale=grayscale,
                              figsize=(8, 4), subtitle=False,
                              savefig={'fname': figfile, 'format': figfmt},
                              show=False, ylabel=False, compounded=compounded,
                              prepare_returns=False)
-    tpl = tpl.replace('{{dd_periods_long}}', _embed_figure(figfile, figfmt))
+    tpl = tpl.replace('{{dd_periods}}', _embed_figure(figfile, figfmt))
 
     figfile = _utils._file_stream()
-    _plots.drawdown(longside_return, grayscale=grayscale,
+    _plots.drawdown(returns, grayscale=grayscale,
                     figsize=(8, 3), subtitle=False,
                     savefig={'fname': figfile, 'format': figfmt},
                     show=False, ylabel=False)
-    tpl = tpl.replace('{{dd_plot_long}}', _embed_figure(figfile, figfmt))
+    tpl = tpl.replace('{{dd_plot}}', _embed_figure(figfile, figfmt))
 
     figfile = _utils._file_stream()
-    _plots.monthly_heatmap(longside_return, grayscale=grayscale,
+    _plots.monthly_heatmap(returns, grayscale=grayscale,
                            figsize=(8, 4), cbar=False,
                            savefig={'fname': figfile, 'format': figfmt},
                            show=False, ylabel=False, compounded=compounded)
-    tpl = tpl.replace('{{monthly_heatmap_long}}', _embed_figure(figfile, figfmt))
+    tpl = tpl.replace('{{monthly_heatmap}}', _embed_figure(figfile, figfmt))
 
     figfile = _utils._file_stream()
-    _plots.distribution(longside_return, grayscale=grayscale,
+    _plots.distribution(returns, grayscale=grayscale,
                         figsize=(8, 4), subtitle=False,
                         savefig={'fname': figfile, 'format': figfmt},
                         show=False, ylabel=False, compounded=compounded,
                         prepare_returns=False)
-    tpl = tpl.replace('{{returns_dist_long}}', _embed_figure(figfile, figfmt))
+    tpl = tpl.replace('{{returns_dist}}', _embed_figure(figfile, figfmt))
 
     tpl = _regex.sub(r'\{\{(.*?)\}\}', '', tpl)
     tpl = tpl.replace('white-space:pre;', '')

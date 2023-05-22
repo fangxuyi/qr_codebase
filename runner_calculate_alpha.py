@@ -12,7 +12,7 @@ def merge(dict_list):
 
 
 config_file_names = [
-                     r"\intraday\intraday_strength.yaml",
+                     r"\intraday\reversal_vwap.yaml",
                      ]
 
 if __name__ == '__main__':
