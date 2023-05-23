@@ -2,21 +2,6 @@ import numpy as np
 import pandas as pd
 
 
-def turnover(returns):
-    turnover = returns.pivot_table(index="date", columns="code", values="weight")
-    return turnover.diff().apply(abs).sum(axis=1)
-
-
-def longside_return(returns):
-    returns = returns[returns["weight"] > 0]
-    return returns[["date", "contributed_return"]].groupby("date").sum()["contributed_return"]
-
-
-def shortside_return(returns):
-    returns = returns[returns["weight"] < 0]
-    return returns[["date", "contributed_return"]].groupby("date").sum()["contributed_return"]
-
-
 class PerformanceEvaluatingUtils:
 
     def __init__(self, data_loader):
@@ -54,8 +39,6 @@ class PerformanceEvaluatingUtils:
         delay_1_returns = pd.merge(delayed_alpha, returns, left_on=["code", "date"], right_on=["code", "date"],
                                  how="left")
         delay_1_returns["contributed_return"] = delay_1_returns["return"] * delay_1_returns["weight"]
-        delay_1_returns = delay_1_returns[["date", "contributed_return"]].groupby("date").sum()
-        delay_1_returns.index = pd.to_datetime(delay_1_returns.index.astype(str))
 
         output = []
         for ele in self.delayed_return_config:

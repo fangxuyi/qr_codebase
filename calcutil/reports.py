@@ -67,15 +67,15 @@ def _match_dates(returns, benchmark):
     return returns, benchmark
 
 
-def plot_timeseries(returns, all_returns,
+def plot_timeseries_returns(returns, all_returns,
                     title="Returns", returns_label="Delay 1",
-                    percent=True, lw=1.5, figsize=(10, 6), ylabel="",
+                    percent=True, lw=1.5, figsize=(8, 4), ylabel="",
                     grayscale=False, fontname="Arial",
                     subtitle=True, savefig=None, show=True):
 
     colors, ls, alpha = _core._get_colors(grayscale)
     returns.fillna(0, inplace=True)
-    returns = returns.cumsum()
+    returns = (1 + returns).cumprod() - 1
 
     fig, ax = _plt.subplots(figsize=figsize)
     ax.spines['top'].set_visible(False)
@@ -99,7 +99,7 @@ def plot_timeseries(returns, all_returns,
     ax.plot(returns, lw=lw, label=returns_label, color=colors[0], alpha=alpha)
 
     color_indicator = 1
-    all_returns = all_returns.cumsum()
+    all_returns = (all_returns + 1).cumprod() - 1
     for col in all_returns:
         ax.plot(all_returns[col], lw=lw, label=col, color=colors[color_indicator], alpha=alpha)
         color_indicator += 1
@@ -148,8 +148,167 @@ def plot_timeseries(returns, all_returns,
 
     return None
 
+def plot_turnover(weights,
+                    title="Returns", returns_label="delay 1",
+                    percent=True, lw=1.5, figsize=(8, 4), ylabel="",
+                    grayscale=False, fontname="Arial",
+                    subtitle=True, savefig=None, show=True):
 
-def html(returns, all_returns, benchmark=None, rf=0., grayscale=False,
+    colors, ls, alpha = _core._get_colors(grayscale)
+    weights.fillna(0, inplace=True)
+    turnover = weights.diff()
+    turnover = turnover.applymap(abs).sum(axis=1)
+
+    fig, ax = _plt.subplots(figsize=figsize)
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['bottom'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+
+    fig.suptitle(title+"\n", y=.99, fontweight="bold", fontname=fontname,
+                 fontsize=14, color="black")
+
+    if subtitle:
+        ax.set_title("\n%s - %s                  " % (
+            turnover.index.date[:1][0].strftime('%e %b \'%y'),
+            turnover.index.date[-1:][0].strftime('%e %b \'%y')
+        ), fontsize=12, color='gray')
+
+    fig.set_facecolor('white')
+    ax.set_facecolor('white')
+
+    alpha = .25 if grayscale else 1
+    ax.plot(turnover, lw=lw, label=returns_label, color=colors[0], alpha=alpha)
+
+    # rotate and align the tick labels so they look better
+    fig.autofmt_xdate()
+
+    ax.axhline(0, ls="-", lw=1,
+               color='gray', zorder=1)
+    ax.axhline(0, ls="--", lw=1,
+               color='white' if grayscale else 'black', zorder=2)
+    ax.legend()
+
+    if percent:
+        ax.yaxis.set_major_formatter(_FuncFormatter(_core.format_pct_axis))
+
+    ax.set_xlabel('')
+    if ylabel:
+        ax.set_ylabel(ylabel, fontname=fontname,
+                      fontweight='bold', fontsize=12, color="black")
+    ax.yaxis.set_label_coords(-.1, .5)
+
+    try:
+        _plt.subplots_adjust(hspace=0, bottom=0, top=1)
+    except Exception:
+        pass
+
+    try:
+        fig.tight_layout()
+    except Exception:
+        pass
+
+    if savefig:
+        if isinstance(savefig, dict):
+            _plt.savefig(**savefig)
+        else:
+            _plt.savefig(savefig)
+
+    if show:
+        _plt.show(block=False)
+
+    _plt.close()
+
+    if not show:
+        return fig
+
+    return None
+
+def plot_long_short_side_returns(returns_details, weights,
+                    title="Returns by Side",
+                    percent=True, lw=1.5, figsize=(8, 4), ylabel="",
+                    grayscale=False, fontname="Arial",
+                    subtitle=True, savefig=None, show=True):
+
+    colors, ls, alpha = _core._get_colors(grayscale)
+    weights.fillna(0, inplace=True)
+    weights_long = weights.applymap(lambda x: x if x > 0 else 0)
+    weights_short = weights.applymap(lambda x: x if x < 0 else 0)
+    returns = (weights * returns_details).sum(axis=1)
+    returns_long = (weights_long * returns_details).sum(axis=1)
+    returns_short = (weights_short * returns_details).sum(axis=1)
+    returns = (1 + returns).cumprod() - 1
+    returns_long_cum = (returns.diff() * (returns_long / (returns_long + returns_short))).cumsum()
+    returns_short_cum = (returns.diff() * (returns_short / (returns_long + returns_short))).cumsum()
+
+    fig, ax = _plt.subplots(figsize=figsize)
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['bottom'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+
+    fig.suptitle(title+"\n", y=.99, fontweight="bold", fontname=fontname,
+                 fontsize=14, color="black")
+
+    if subtitle:
+        ax.set_title("\n%s - %s                  " % (
+            returns_long_cum.index.date[:1][0].strftime('%e %b \'%y'),
+            returns_long_cum.index.date[-1:][0].strftime('%e %b \'%y')
+        ), fontsize=12, color='gray')
+
+    fig.set_facecolor('white')
+    ax.set_facecolor('white')
+
+    alpha = .25 if grayscale else 1
+    ax.plot(returns, lw=lw, label="total", color=colors[0], alpha=alpha)
+    ax.plot(returns_long_cum, lw=lw, label="long", color=colors[1], alpha=alpha)
+    ax.plot(returns_short_cum, lw=lw, label="short", color=colors[2], alpha=alpha)
+
+    # rotate and align the tick labels so they look better
+    fig.autofmt_xdate()
+
+    ax.axhline(0, ls="-", lw=1,
+               color='gray', zorder=1)
+    ax.axhline(0, ls="--", lw=1,
+               color='white' if grayscale else 'black', zorder=2)
+    ax.legend()
+
+    if percent:
+        ax.yaxis.set_major_formatter(_FuncFormatter(_core.format_pct_axis))
+
+    ax.set_xlabel('')
+    if ylabel:
+        ax.set_ylabel(ylabel, fontname=fontname,
+                      fontweight='bold', fontsize=12, color="black")
+    ax.yaxis.set_label_coords(-.1, .5)
+
+    try:
+        _plt.subplots_adjust(hspace=0, bottom=0, top=1)
+    except Exception:
+        pass
+
+    try:
+        fig.tight_layout()
+    except Exception:
+        pass
+
+    if savefig:
+        if isinstance(savefig, dict):
+            _plt.savefig(**savefig)
+        else:
+            _plt.savefig(savefig)
+
+    if show:
+        _plt.show(block=False)
+
+    _plt.close()
+
+    if not show:
+        return fig
+
+    return None
+
+def html(returns, all_returns, weights, delay_1_returns_details, benchmark=None, rf=0., grayscale=False,
          title='Strategy Tearsheet', output=None, compounded=True,
          periods_per_year=252, download_filename='quantstats-tearsheet.html',
          figfmt='svg', template_path=None, match_dates=False, **kwargs):
@@ -209,28 +368,26 @@ def html(returns, all_returns, benchmark=None, rf=0., grayscale=False,
 
     # plots
     figfile = _utils._file_stream()
-    plot_timeseries(returns, all_returns,
+    plot_timeseries_returns(returns, all_returns,
                     title="Cumulative Returns", returns_label="delay 1",
-                    percent=True, lw=1.5, figsize=(10, 6), ylabel="",
+                    percent=True, lw=1.5, figsize=(8, 4), ylabel="",
                     grayscale=False, fontname="Arial",
-                    subtitle=False, savefig={'fname': figfile, 'format': figfmt}, show=True)
+                    subtitle=False, savefig={'fname': figfile, 'format': figfmt}, show=False)
     tpl = tpl.replace('{{returns}}', _embed_figure(figfile, figfmt))
 
     figfile = _utils._file_stream()
-    _plots.log_returns(returns, benchmark, grayscale=grayscale,
-                       figsize=(8, 4), subtitle=False,
-                       savefig={'fname': figfile, 'format': figfmt},
-                       show=False, ylabel=False, cumulative=compounded,
-                       prepare_returns=False)
-    tpl = tpl.replace('{{log_returns}}', _embed_figure(figfile, figfmt))
+    plot_turnover(weights, title="Turnover", returns_label="delay 1",
+                    percent=True, lw=1.5, figsize=(8, 4), ylabel="",
+                    grayscale=False, fontname="Arial",
+                    subtitle=False, savefig={'fname': figfile, 'format': figfmt}, show=False)
+    tpl = tpl.replace('{{turnovers}}', _embed_figure(figfile, figfmt))
 
     figfile = _utils._file_stream()
-    _plots.yearly_returns(returns, benchmark, grayscale=grayscale,
-                          figsize=(8, 4), subtitle=False,
-                          savefig={'fname': figfile, 'format': figfmt},
-                          show=False, ylabel=False, compounded=compounded,
-                          prepare_returns=False)
-    tpl = tpl.replace('{{eoy_returns}}', _embed_figure(figfile, figfmt))
+    plot_long_short_side_returns(delay_1_returns_details, weights, title="Long Short Attributions",
+                                 percent=True, lw=1.5, figsize=(8, 4), ylabel="",
+                                 grayscale=False, fontname="Arial",
+                                 subtitle=False, savefig={'fname': figfile, 'format': figfmt}, show=False)
+    tpl = tpl.replace('{{long_short_side_returns}}', _embed_figure(figfile, figfmt))
 
     figfile = _utils._file_stream()
     _plots.histogram(returns, grayscale=grayscale,

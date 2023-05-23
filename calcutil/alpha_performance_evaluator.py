@@ -35,10 +35,17 @@ class PerformanceEvaluator:
         returns["code"] = returns["code"].apply(lambda x: x.decode('utf-8'))
         returns["date"] = returns["date"].astype(int)
 
-        delay_1_returns, all_returns = self.alpha_performance_evaluating_utils.calculate_all_delayed_returns(alpha, returns)
-        DataProcessor.write_performance_data(alpha_name, all_returns)
+        delay_1, all_returns = self.alpha_performance_evaluating_utils.calculate_all_delayed_returns(alpha, returns)
+        delay_1_returns = delay_1[["date", "contributed_return"]].groupby("date").sum()
+        delay_1_returns.index = pd.to_datetime(delay_1_returns.index.astype(str))
 
-        reports.html(delay_1_returns["contributed_return"], all_returns, output=True,
+        delay_1_returns_details = delay_1.pivot_table(index="date", columns="code", values="return")
+        delay_1_returns_details.index = pd.to_datetime(delay_1_returns_details.index.astype(str))
+        delay_1_weights = delay_1.pivot_table(index="date", columns="code", values="weight")
+        delay_1_weights.index = pd.to_datetime(delay_1_weights.index.astype(str))
+        DataProcessor.write_performance_data(alpha_name, delay_1)
+
+        reports.html(delay_1_returns["contributed_return"], all_returns, delay_1_weights, delay_1_returns_details, output=True,
                                  download_filename=TearSheetOutputPath + f"\\{alpha_name}.html")
         logger.info(f"calculated performance for {alpha_name} in {time.perf_counter() - t} seconds")
 
