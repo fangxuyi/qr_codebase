@@ -17,9 +17,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import numpy as np
 import pandas as _pd
 import numpy as _np
+import pandas as pd
 from pandas import DataFrame as _df
 from math import sqrt as _sqrt, ceil as _ceil
 from datetime import (
@@ -75,7 +76,7 @@ def plot_timeseries_returns(returns, all_returns,
 
     colors, ls, alpha = _core._get_colors(grayscale)
     returns.fillna(0, inplace=True)
-    returns = (1 + returns).cumprod() - 1
+    returns = returns.cumsum()
 
     fig, ax = _plt.subplots(figsize=figsize)
     ax.spines['top'].set_visible(False)
@@ -99,7 +100,7 @@ def plot_timeseries_returns(returns, all_returns,
     ax.plot(returns, lw=lw, label=returns_label, color=colors[0], alpha=alpha)
 
     color_indicator = 1
-    all_returns = (all_returns + 1).cumprod() - 1
+    all_returns = all_returns.cumsum()
     for col in all_returns:
         ax.plot(all_returns[col], lw=lw, label=col, color=colors[color_indicator], alpha=alpha)
         color_indicator += 1
@@ -237,9 +238,9 @@ def plot_long_short_side_returns(returns_details, weights,
     returns = (weights * returns_details).sum(axis=1)
     returns_long = (weights_long * returns_details).sum(axis=1)
     returns_short = (weights_short * returns_details).sum(axis=1)
-    returns = (1 + returns).cumprod() - 1
-    returns_long_cum = (returns.diff() * (returns_long / (returns_long + returns_short))).cumsum()
-    returns_short_cum = (returns.diff() * (returns_short / (returns_long + returns_short))).cumsum()
+    returns = returns.cumsum()
+    returns_long_cum = returns_long.cumsum()
+    returns_short_cum = returns_short.cumsum()
 
     fig, ax = _plt.subplots(figsize=figsize)
     ax.spines['top'].set_visible(False)
@@ -308,8 +309,422 @@ def plot_long_short_side_returns(returns_details, weights,
 
     return None
 
+def plot_concentration(weights, title="Concentration by Side",
+                        percent=True, lw=1.5, figsize=(8, 4), ylabel="",
+                        grayscale=False, fontname="Arial",
+                        subtitle=True, savefig=None, show=True):
+
+    colors, ls, alpha = _core._get_colors(grayscale)
+    weights.fillna(0, inplace=True)
+    weights_long = weights.applymap(lambda x: x if x > 0 else np.nan).replace(0., np.nan)
+    weights_short = weights.applymap(lambda x: x if x < 0 else np.nan).replace(0., np.nan)
+    weights_long_daily = weights_long.apply(lambda x: x.dropna().quantile(0.95), axis=1)
+    weights_short_daily = weights_short.apply(lambda x: x.dropna().quantile(0.05), axis=1)
+    weights_long_mask = weights_long.apply(lambda x: x > weights_long_daily, axis=0)
+    weights_short_mask = weights_short.apply(lambda x: x < weights_short_daily, axis=0)
+    weights_long = weights_long[weights_long_mask].fillna(0.)
+    weights_short = weights_short[weights_short_mask].fillna(0.)
+
+    weights_long = weights_long.sum(axis=1)
+    weights_short = weights_short.sum(axis=1)
+
+    fig, ax = _plt.subplots(figsize=figsize)
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['bottom'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+
+    fig.suptitle(title+"\n", y=.99, fontweight="bold", fontname=fontname,
+                 fontsize=14, color="black")
+
+    if subtitle:
+        ax.set_title("\n%s - %s                  " % (
+            weights_long.index.date[:1][0].strftime('%e %b \'%y'),
+            weights_long.index.date[-1:][0].strftime('%e %b \'%y')
+        ), fontsize=12, color='gray')
+
+    fig.set_facecolor('white')
+    ax.set_facecolor('white')
+
+    alpha = .25 if grayscale else 1
+    ax.plot(weights_long, lw=lw, label="long top 5%", color=colors[1], alpha=alpha)
+    ax.plot(weights_short, lw=lw, label="short top 5%", color=colors[2], alpha=alpha)
+
+    # rotate and align the tick labels so they look better
+    fig.autofmt_xdate()
+
+    ax.axhline(0, ls="-", lw=1,
+               color='gray', zorder=1)
+    ax.axhline(0, ls="--", lw=1,
+               color='white' if grayscale else 'black', zorder=2)
+    ax.legend()
+
+    if percent:
+        ax.yaxis.set_major_formatter(_FuncFormatter(_core.format_pct_axis))
+
+    ax.set_xlabel('')
+    if ylabel:
+        ax.set_ylabel(ylabel, fontname=fontname,
+                      fontweight='bold', fontsize=12, color="black")
+    ax.yaxis.set_label_coords(-.1, .5)
+
+    try:
+        _plt.subplots_adjust(hspace=0, bottom=0, top=1)
+    except Exception:
+        pass
+
+    try:
+        fig.tight_layout()
+    except Exception:
+        pass
+
+    if savefig:
+        if isinstance(savefig, dict):
+            _plt.savefig(**savefig)
+        else:
+            _plt.savefig(savefig)
+
+    if show:
+        _plt.show(block=False)
+
+    _plt.close()
+
+    if not show:
+        return fig
+
+    return None
+
+
+def plot_return_by_quantile_long(returns_details, weights,
+                    title="Returns by quantile (actual weight long)",
+                    percent=True, lw=1.5, figsize=(8, 4), ylabel="",
+                    grayscale=False, fontname="Arial",
+                    subtitle=True, savefig=None, show=True):
+
+    colors, ls, alpha = _core._get_colors(grayscale)
+    weights.fillna(0, inplace=True)
+    weights_long = weights.applymap(lambda x: x if x > 0 else np.nan).replace(0., np.nan)
+    weights_long_mask = weights_long.apply(lambda x: pd.qcut(x.dropna(), 5, labels=["zero", "zero-medium", "medium", "medium-max", "max"]), axis=1)
+    returns = (weights * returns_details)
+
+    fig, ax = _plt.subplots(figsize=figsize)
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['bottom'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+
+    fig.suptitle(title+"\n", y=.99, fontweight="bold", fontname=fontname,
+                 fontsize=14, color="black")
+
+    if subtitle:
+        ax.set_title("\n%s - %s                  " % (
+            returns.index.date[:1][0].strftime('%e %b \'%y'),
+            returns.index.date[-1:][0].strftime('%e %b \'%y')
+        ), fontsize=12, color='gray')
+
+    fig.set_facecolor('white')
+    ax.set_facecolor('white')
+
+    alpha = .25 if grayscale else 1
+    ax.plot(returns[weights_long_mask == "zero"].sum(axis=1).cumsum(), lw=lw, label="zero", color=colors[1], alpha=alpha)
+    ax.plot(returns[weights_long_mask == "zero-medium"].sum(axis=1).cumsum(), lw=lw, label="zero-medium", color=colors[2], alpha=alpha)
+    ax.plot(returns[weights_long_mask == "medium"].sum(axis=1).cumsum(), lw=lw, label="medium", color=colors[3], alpha=alpha)
+    ax.plot(returns[weights_long_mask == "medium-max"].sum(axis=1).cumsum(), lw=lw, label="medium-max", color=colors[4], alpha=alpha)
+    ax.plot(returns[weights_long_mask == "max"].sum(axis=1).cumsum(), lw=lw, label="max", color=colors[5], alpha=alpha)
+
+    # rotate and align the tick labels so they look better
+    fig.autofmt_xdate()
+
+    ax.axhline(0, ls="-", lw=1,
+               color='gray', zorder=1)
+    ax.axhline(0, ls="--", lw=1,
+               color='white' if grayscale else 'black', zorder=2)
+    ax.legend()
+
+    if percent:
+        ax.yaxis.set_major_formatter(_FuncFormatter(_core.format_pct_axis))
+
+    ax.set_xlabel('')
+    if ylabel:
+        ax.set_ylabel(ylabel, fontname=fontname,
+                      fontweight='bold', fontsize=12, color="black")
+    ax.yaxis.set_label_coords(-.1, .5)
+
+    try:
+        _plt.subplots_adjust(hspace=0, bottom=0, top=1)
+    except Exception:
+        pass
+
+    try:
+        fig.tight_layout()
+    except Exception:
+        pass
+
+    if savefig:
+        if isinstance(savefig, dict):
+            _plt.savefig(**savefig)
+        else:
+            _plt.savefig(savefig)
+
+    if show:
+        _plt.show(block=False)
+
+    _plt.close()
+
+    if not show:
+        return fig
+
+    return None
+
+
+def plot_return_by_quantile_long_equalweight(returns_details, weights,
+                    title="Returns by quantile (equal weight long)",
+                    percent=True, lw=1.5, figsize=(8, 4), ylabel="",
+                    grayscale=False, fontname="Arial",
+                    subtitle=True, savefig=None, show=True):
+
+    colors, ls, alpha = _core._get_colors(grayscale)
+    weights.fillna(0, inplace=True)
+    weights_long = weights.applymap(lambda x: x if x > 0 else np.nan).replace(0., np.nan)
+    weights_long_mask = weights_long.apply(lambda x: pd.qcut(x.dropna(), 5, labels=["zero", "zero-medium", "medium", "medium-max", "max"]), axis=1)
+    returns = returns_details
+
+    fig, ax = _plt.subplots(figsize=figsize)
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['bottom'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+
+    fig.suptitle(title+"\n", y=.99, fontweight="bold", fontname=fontname,
+                 fontsize=14, color="black")
+
+    if subtitle:
+        ax.set_title("\n%s - %s                  " % (
+            returns.index.date[:1][0].strftime('%e %b \'%y'),
+            returns.index.date[-1:][0].strftime('%e %b \'%y')
+        ), fontsize=12, color='gray')
+
+    fig.set_facecolor('white')
+    ax.set_facecolor('white')
+
+    alpha = .25 if grayscale else 1
+    ax.plot(returns[weights_long_mask == "zero"].mean(axis=1).cumsum(), lw=lw, label="zero", color=colors[1], alpha=alpha)
+    ax.plot(returns[weights_long_mask == "zero-medium"].mean(axis=1).cumsum(), lw=lw, label="zero-medium", color=colors[2], alpha=alpha)
+    ax.plot(returns[weights_long_mask == "medium"].mean(axis=1).cumsum(), lw=lw, label="medium", color=colors[3], alpha=alpha)
+    ax.plot(returns[weights_long_mask == "medium-max"].mean(axis=1).cumsum(), lw=lw, label="medium-max", color=colors[4], alpha=alpha)
+    ax.plot(returns[weights_long_mask == "max"].mean(axis=1).cumsum(), lw=lw, label="max", color=colors[5], alpha=alpha)
+
+    # rotate and align the tick labels so they look better
+    fig.autofmt_xdate()
+
+    ax.axhline(0, ls="-", lw=1,
+               color='gray', zorder=1)
+    ax.axhline(0, ls="--", lw=1,
+               color='white' if grayscale else 'black', zorder=2)
+    ax.legend()
+
+    if percent:
+        ax.yaxis.set_major_formatter(_FuncFormatter(_core.format_pct_axis))
+
+    ax.set_xlabel('')
+    if ylabel:
+        ax.set_ylabel(ylabel, fontname=fontname,
+                      fontweight='bold', fontsize=12, color="black")
+    ax.yaxis.set_label_coords(-.1, .5)
+
+    try:
+        _plt.subplots_adjust(hspace=0, bottom=0, top=1)
+    except Exception:
+        pass
+
+    try:
+        fig.tight_layout()
+    except Exception:
+        pass
+
+    if savefig:
+        if isinstance(savefig, dict):
+            _plt.savefig(**savefig)
+        else:
+            _plt.savefig(savefig)
+
+    if show:
+        _plt.show(block=False)
+
+    _plt.close()
+
+    if not show:
+        return fig
+
+    return None
+
+
+def plot_return_by_quantile_short(returns_details, weights,
+                    title="Returns by quantile (actual weight short)",
+                    percent=True, lw=1.5, figsize=(8, 4), ylabel="",
+                    grayscale=False, fontname="Arial",
+                    subtitle=True, savefig=None, show=True):
+
+    colors, ls, alpha = _core._get_colors(grayscale)
+    weights.fillna(0, inplace=True)
+    weights_short = weights.applymap(lambda x: x if x < 0 else np.nan).replace(0., np.nan)
+    weights_short_mask = weights_short.apply(lambda x: pd.qcut(x.dropna(), 5, labels=["min", "min-medium", "medium", "medium-zero", "zero"]), axis=1)
+    returns = (weights * returns_details)
+
+    fig, ax = _plt.subplots(figsize=figsize)
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['bottom'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+
+    fig.suptitle(title+"\n", y=.99, fontweight="bold", fontname=fontname,
+                 fontsize=14, color="black")
+
+    if subtitle:
+        ax.set_title("\n%s - %s                  " % (
+            returns.index.date[:1][0].strftime('%e %b \'%y'),
+            returns.index.date[-1:][0].strftime('%e %b \'%y')
+        ), fontsize=12, color='gray')
+
+    fig.set_facecolor('white')
+    ax.set_facecolor('white')
+
+    alpha = .25 if grayscale else 1
+    ax.plot(returns[weights_short_mask == "min"].sum(axis=1).cumsum(), lw=lw, label="min", color=colors[1], alpha=alpha)
+    ax.plot(returns[weights_short_mask == "min-medium"].sum(axis=1).cumsum(), lw=lw, label="min-medium", color=colors[2], alpha=alpha)
+    ax.plot(returns[weights_short_mask == "medium"].sum(axis=1).cumsum(), lw=lw, label="medium", color=colors[3], alpha=alpha)
+    ax.plot(returns[weights_short_mask == "medium-zero"].sum(axis=1).cumsum(), lw=lw, label="medium-zero", color=colors[4], alpha=alpha)
+    ax.plot(returns[weights_short_mask == "zero"].sum(axis=1).cumsum(), lw=lw, label="zero", color=colors[5], alpha=alpha)
+
+    # rotate and align the tick labels so they look better
+    fig.autofmt_xdate()
+
+    ax.axhline(0, ls="-", lw=1,
+               color='gray', zorder=1)
+    ax.axhline(0, ls="--", lw=1,
+               color='white' if grayscale else 'black', zorder=2)
+    ax.legend()
+
+    if percent:
+        ax.yaxis.set_major_formatter(_FuncFormatter(_core.format_pct_axis))
+
+    ax.set_xlabel('')
+    if ylabel:
+        ax.set_ylabel(ylabel, fontname=fontname,
+                      fontweight='bold', fontsize=12, color="black")
+    ax.yaxis.set_label_coords(-.1, .5)
+
+    try:
+        _plt.subplots_adjust(hspace=0, bottom=0, top=1)
+    except Exception:
+        pass
+
+    try:
+        fig.tight_layout()
+    except Exception:
+        pass
+
+    if savefig:
+        if isinstance(savefig, dict):
+            _plt.savefig(**savefig)
+        else:
+            _plt.savefig(savefig)
+
+    if show:
+        _plt.show(block=False)
+
+    _plt.close()
+
+    if not show:
+        return fig
+
+    return None
+
+
+def plot_return_by_quantile_short_equalweight(returns_details, weights,
+                    title="Returns by quantile (equal weight short)",
+                    percent=True, lw=1.5, figsize=(8, 4), ylabel="",
+                    grayscale=False, fontname="Arial",
+                    subtitle=True, savefig=None, show=True):
+
+    colors, ls, alpha = _core._get_colors(grayscale)
+    weights.fillna(0, inplace=True)
+    weights_short = weights.applymap(lambda x: x if x < 0 else np.nan).replace(0., np.nan)
+    weights_short_mask = weights_short.apply(lambda x: pd.qcut(x.dropna(), 5, labels=["min", "min-medium", "medium", "medium-zero", "zero"]), axis=1)
+    returns = returns_details * -1
+
+    fig, ax = _plt.subplots(figsize=figsize)
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['bottom'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+
+    fig.suptitle(title+"\n", y=.99, fontweight="bold", fontname=fontname,
+                 fontsize=14, color="black")
+
+    if subtitle:
+        ax.set_title("\n%s - %s                  " % (
+            returns.index.date[:1][0].strftime('%e %b \'%y'),
+            returns.index.date[-1:][0].strftime('%e %b \'%y')
+        ), fontsize=12, color='gray')
+
+    fig.set_facecolor('white')
+    ax.set_facecolor('white')
+
+    alpha = .25 if grayscale else 1
+    ax.plot(returns[weights_short_mask == "min"].mean(axis=1).cumsum(), lw=lw, label="min", color=colors[1], alpha=alpha)
+    ax.plot(returns[weights_short_mask == "min-medium"].mean(axis=1).cumsum(), lw=lw, label="min-medium", color=colors[2], alpha=alpha)
+    ax.plot(returns[weights_short_mask == "medium"].mean(axis=1).cumsum(), lw=lw, label="medium", color=colors[3], alpha=alpha)
+    ax.plot(returns[weights_short_mask == "medium-zero"].mean(axis=1).cumsum(), lw=lw, label="medium-zero", color=colors[4], alpha=alpha)
+    ax.plot(returns[weights_short_mask == "zero"].mean(axis=1).cumsum(), lw=lw, label="zero", color=colors[5], alpha=alpha)
+
+    # rotate and align the tick labels so they look better
+    fig.autofmt_xdate()
+
+    ax.axhline(0, ls="-", lw=1,
+               color='gray', zorder=1)
+    ax.axhline(0, ls="--", lw=1,
+               color='white' if grayscale else 'black', zorder=2)
+    ax.legend()
+
+    if percent:
+        ax.yaxis.set_major_formatter(_FuncFormatter(_core.format_pct_axis))
+
+    ax.set_xlabel('')
+    if ylabel:
+        ax.set_ylabel(ylabel, fontname=fontname,
+                      fontweight='bold', fontsize=12, color="black")
+    ax.yaxis.set_label_coords(-.1, .5)
+
+    try:
+        _plt.subplots_adjust(hspace=0, bottom=0, top=1)
+    except Exception:
+        pass
+
+    try:
+        fig.tight_layout()
+    except Exception:
+        pass
+
+    if savefig:
+        if isinstance(savefig, dict):
+            _plt.savefig(**savefig)
+        else:
+            _plt.savefig(savefig)
+
+    if show:
+        _plt.show(block=False)
+
+    _plt.close()
+
+    if not show:
+        return fig
+
+    return None
+
+
 def html(returns, all_returns, weights, delay_1_returns_details, benchmark=None, rf=0., grayscale=False,
-         title='Strategy Tearsheet', output=None, compounded=True,
+         title='Strategy Tearsheet', output=None, compounded=False,
          periods_per_year=252, download_filename='quantstats-tearsheet.html',
          figfmt='svg', template_path=None, match_dates=False, **kwargs):
 
@@ -390,44 +805,39 @@ def html(returns, all_returns, weights, delay_1_returns_details, benchmark=None,
     tpl = tpl.replace('{{long_short_side_returns}}', _embed_figure(figfile, figfmt))
 
     figfile = _utils._file_stream()
-    _plots.histogram(returns, grayscale=grayscale,
-                     figsize=(8, 4), subtitle=False,
-                     savefig={'fname': figfile, 'format': figfmt},
-                     show=False, ylabel=False, compounded=compounded,
-                     prepare_returns=False)
-    tpl = tpl.replace('{{monthly_dist}}', _embed_figure(figfile, figfmt))
+    plot_concentration(weights,  title="Concentration by Side",
+                       percent=True, lw=1.5, figsize=(8, 4), ylabel="",
+                       grayscale=False, fontname="Arial",
+                       subtitle=False, savefig={'fname': figfile, 'format': figfmt}, show=False)
+    tpl = tpl.replace('{{concentration}}', _embed_figure(figfile, figfmt))
 
     figfile = _utils._file_stream()
-    _plots.daily_returns(returns, grayscale=grayscale,
-                         figsize=(8, 3), subtitle=False,
-                         savefig={'fname': figfile, 'format': figfmt},
-                         show=False, ylabel=False,
-                         prepare_returns=False)
-    tpl = tpl.replace('{{daily_returns}}', _embed_figure(figfile, figfmt))
+    plot_return_by_quantile_long(delay_1_returns_details, weights, title="Returns by quantile (actual weight long)",
+                                 percent=True, lw=1.5, figsize=(8, 4), ylabel="",
+                                 grayscale=False, fontname="Arial",
+                                 subtitle=False, savefig={'fname': figfile, 'format': figfmt}, show=False)
+    tpl = tpl.replace('{{plot_return_by_quantile_long}}', _embed_figure(figfile, figfmt))
 
     figfile = _utils._file_stream()
-    _plots.rolling_volatility(returns, benchmark, grayscale=grayscale,
-                              figsize=(8, 3), subtitle=False,
-                              savefig={'fname': figfile, 'format': figfmt},
-                              show=False, ylabel=False, period=win_half_year,
-                              periods_per_year=win_year)
-    tpl = tpl.replace('{{rolling_vol}}', _embed_figure(figfile, figfmt))
+    plot_return_by_quantile_long_equalweight(delay_1_returns_details, weights, title="Returns by quantile (equal weight long)",
+                                 percent=True, lw=1.5, figsize=(8, 4), ylabel="",
+                                 grayscale=False, fontname="Arial",
+                                 subtitle=False, savefig={'fname': figfile, 'format': figfmt}, show=False)
+    tpl = tpl.replace('{{plot_return_by_quantile_long_equalweight}}', _embed_figure(figfile, figfmt))
 
     figfile = _utils._file_stream()
-    _plots.rolling_sharpe(returns, grayscale=grayscale,
-                          figsize=(8, 3), subtitle=False,
-                          savefig={'fname': figfile, 'format': figfmt},
-                          show=False, ylabel=False, period=win_half_year,
-                          periods_per_year=win_year)
-    tpl = tpl.replace('{{rolling_sharpe}}', _embed_figure(figfile, figfmt))
+    plot_return_by_quantile_short(delay_1_returns_details, weights, title="Returns by quantile (actual weight short)",
+                                 percent=True, lw=1.5, figsize=(8, 4), ylabel="",
+                                 grayscale=False, fontname="Arial",
+                                 subtitle=False, savefig={'fname': figfile, 'format': figfmt}, show=False)
+    tpl = tpl.replace('{{plot_return_by_quantile_short}}', _embed_figure(figfile, figfmt))
 
     figfile = _utils._file_stream()
-    _plots.rolling_sortino(returns, grayscale=grayscale,
-                           figsize=(8, 3), subtitle=False,
-                           savefig={'fname': figfile, 'format': figfmt},
-                           show=False, ylabel=False, period=win_half_year,
-                           periods_per_year=win_year)
-    tpl = tpl.replace('{{rolling_sortino}}', _embed_figure(figfile, figfmt))
+    plot_return_by_quantile_short_equalweight(delay_1_returns_details, weights, title="Returns by quantile (equal weight short)",
+                                 percent=True, lw=1.5, figsize=(8, 4), ylabel="",
+                                 grayscale=False, fontname="Arial",
+                                 subtitle=False, savefig={'fname': figfile, 'format': figfmt}, show=False)
+    tpl = tpl.replace('{{plot_return_by_quantile_short_equalweight}}', _embed_figure(figfile, figfmt))
 
     figfile = _utils._file_stream()
     _plots.drawdowns_periods(returns, grayscale=grayscale,
