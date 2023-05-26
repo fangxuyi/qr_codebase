@@ -404,7 +404,7 @@ def plot_return_by_quantile_long(returns_details, weights,
     colors, ls, alpha = _core._get_colors(grayscale)
     weights.fillna(0, inplace=True)
     weights_long = weights.applymap(lambda x: x if x > 0 else np.nan).replace(0., np.nan)
-    weights_long_mask = weights_long.apply(lambda x: pd.qcut(x.dropna(), 5, labels=["zero", "zero-medium", "medium", "medium-max", "max"]), axis=1)
+    weights_long_mask = weights_long.apply(lambda x: pd.qcut(x.dropna().rank(method='first'), 5, labels=["zero", "zero-medium", "medium", "medium-max", "max"]), axis=1)
     returns = (weights * returns_details)
 
     fig, ax = _plt.subplots(figsize=figsize)
@@ -486,7 +486,7 @@ def plot_return_by_quantile_long_equalweight(returns_details, weights,
     colors, ls, alpha = _core._get_colors(grayscale)
     weights.fillna(0, inplace=True)
     weights_long = weights.applymap(lambda x: x if x > 0 else np.nan).replace(0., np.nan)
-    weights_long_mask = weights_long.apply(lambda x: pd.qcut(x.dropna(), 5, labels=["zero", "zero-medium", "medium", "medium-max", "max"]), axis=1)
+    weights_long_mask = weights_long.apply(lambda x: pd.qcut(x.dropna().rank(method='first'), 5, labels=["zero", "zero-medium", "medium", "medium-max", "max"]), axis=1)
     returns = returns_details
 
     fig, ax = _plt.subplots(figsize=figsize)
@@ -568,7 +568,7 @@ def plot_return_by_quantile_short(returns_details, weights,
     colors, ls, alpha = _core._get_colors(grayscale)
     weights.fillna(0, inplace=True)
     weights_short = weights.applymap(lambda x: x if x < 0 else np.nan).replace(0., np.nan)
-    weights_short_mask = weights_short.apply(lambda x: pd.qcut(x.dropna(), 5, labels=["min", "min-medium", "medium", "medium-zero", "zero"]), axis=1)
+    weights_short_mask = weights_short.apply(lambda x: pd.qcut(x.dropna().rank(method='first'), 5, labels=["min", "min-medium", "medium", "medium-zero", "zero"]), axis=1)
     returns = (weights * returns_details)
 
     fig, ax = _plt.subplots(figsize=figsize)
@@ -650,7 +650,7 @@ def plot_return_by_quantile_short_equalweight(returns_details, weights,
     colors, ls, alpha = _core._get_colors(grayscale)
     weights.fillna(0, inplace=True)
     weights_short = weights.applymap(lambda x: x if x < 0 else np.nan).replace(0., np.nan)
-    weights_short_mask = weights_short.apply(lambda x: pd.qcut(x.dropna(), 5, labels=["min", "min-medium", "medium", "medium-zero", "zero"]), axis=1)
+    weights_short_mask = weights_short.apply(lambda x: pd.qcut(x.dropna().rank(method='first'), 5, labels=["min", "min-medium", "medium", "medium-zero", "zero"]), axis=1)
     returns = returns_details * -1
 
     fig, ax = _plt.subplots(figsize=figsize)

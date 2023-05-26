@@ -49,7 +49,7 @@ class DataLoader:
             except:
                 logger.info(f"skipping loading on {date}")
                 pass
-
+        print("calculating {}".format(name))
         return pd.concat(output).reset_index(drop=True)
 
     def load_processed_window_list(self, name, window_list, fields=None):
