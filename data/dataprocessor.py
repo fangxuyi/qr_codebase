@@ -31,6 +31,7 @@ class DataProcessor:
 
         try:
             self.process(temp_data_processors, temp_date, temp_names)
+            print("calculating for " + str(temp_date) + " " + str(temp_names))
         except:
             print("skipping for " + str(temp_date) + " " + str(temp_names))
 

@@ -1,0 +1,40 @@
+turnover_returns_10_ZZ9999:
+  classname: Liquidity.TurnoverReturns
+  parameters:
+    lookback: 10
+  universe: ZZ9999
+turnover_returns_21_ZZ9999:
+  classname: Liquidity.TurnoverReturns
+  parameters:
+    lookback: 21
+  universe: ZZ9999
+turnover_returns_3_ZZ9999:
+  classname: Liquidity.TurnoverReturns
+  parameters:
+    lookback: 3
+  universe: ZZ9999
+turnover_returns_5_ZZ9999:
+  classname: Liquidity.TurnoverReturns
+  parameters:
+    lookback: 5
+  universe: ZZ9999
+turnover_returns_63_ZZ9999:
+  classname: Liquidity.TurnoverReturns
+  parameters:
+    lookback: 63
+  universe: ZZ9999
+turnover_returns_1_ZZ9999:
+  classname: Liquidity.TurnoverReturns
+  parameters:
+    lookback: 1
+  universe: ZZ9999
+turnover_returns_126_ZZ9999:
+  classname: Liquidity.TurnoverReturns
+  parameters:
+    lookback: 126
+  universe: ZZ9999
+turnover_returns_252_ZZ9999:
+  classname: Liquidity.TurnoverReturns
+  parameters:
+    lookback: 252
+  universe: ZZ9999

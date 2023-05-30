@@ -14,6 +14,7 @@ class DataLoader:
     referenceDataLoader = ReferenceDataLoader
     trade_dates = None
     halt_date = None
+    market_cap = None
     current_universe = {}
 
     def __init__(self):
@@ -115,6 +116,17 @@ class DataLoader:
                 output.append(tmp[["code", "date", "is_halt"]])
             self.halt_date = pd.concat(output)
         return self.halt_date
+
+    def get_market_cap(self, window_list):
+
+        output = []
+        if self.market_cap is None:
+            market_cap = self.referenceDataLoader.load_reference_data("MarketValue")
+            self.market_cap = market_cap
+        for curdate in window_list:
+            output.append(self.market_cap[self.market_cap["date_int"] == int(curdate)]["code", "date", "mkt_val", "neg_shares"])
+        output = pd.concat(output, axis=0)
+        return output
 
     def get_current_universe(self, date, universe):
         if universe not in self.current_universe.keys():

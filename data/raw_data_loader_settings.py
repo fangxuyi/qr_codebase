@@ -97,6 +97,30 @@ def daily_vwap(pv_data):
     return pv_data
 
 
+def daily_return_driven_by_turnover(pv_data):
+    """pv_1min_daily_turnover"""
+
+    pv_data = pv_data.sort_values("time")
+
+    pv_data["open"] = pv_data["open"]
+    pv_data["close"] = pv_data["close"]
+    pv_data["return"] = (pv_data["close"] / pv_data["open"] - 1).apply(abs)
+    pv_data["return_up"] = (pv_data["close"] / pv_data["open"] - 1).apply(lambda x: x if x > 0 else np.nan)
+    pv_data["return_down"] = (pv_data["close"] / pv_data["open"] - 1).apply(lambda x: x if x < 0 else np.nan)
+
+    pv_data["turover"] = pv_data["turover"]
+    pv_data["abs_return_turnover"] = pv_data["return"] / pv_data["turover"]
+    pv_data["up_return_turnover"] = pv_data["return_up"] / pv_data["turover"]
+    pv_data["down_return_turnover"] = pv_data["return_down"] / pv_data["turover"]
+
+    pv_data = pv_data.groupby("code").agg({
+        "abs_return_turnover": "mean",
+        "up_return_turnover": "mean",
+        "down_return_turnover": "mean",
+    })
+    return pv_data
+
+
 def minute_open_high_low_close(pv_data):
     """pv_1min_high_low_open_close"""
 
@@ -136,7 +160,8 @@ def minute_open_high_low_close_with_volume(pv_data):
     pv_data["high"] = pv_data["high"]
     pv_data["low"] = pv_data["low"]
     pv_data["close"] = pv_data["close"]
-    pv_data["volume"] = pv_data.apply(lambda x: x["volume"] if abs(x["close"] - x["open"]) <= 0.5 * abs(x["high"] - x["low"]) else 0, axis=1)
+    pv_data["volume"] = pv_data.apply(
+        lambda x: x["volume"] if abs(x["close"] - x["open"]) <= 0.5 * abs(x["high"] - x["low"]) else 0, axis=1)
 
     return pv_data.groupby("code").agg({
         "high": max,

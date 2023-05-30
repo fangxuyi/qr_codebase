@@ -27,7 +27,6 @@ class AlphaCalculator:
         instance = args[0]
         date = args[1]
         result = instance.calculate(date)
-        logger.info(f"calculated {args} in {time.perf_counter() - t} seconds")
         return result
 
     @classmethod

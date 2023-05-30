@@ -1,0 +1,40 @@
+turnover_rate_stability_10_ZZ9999:
+  classname: Liquidity.TurnoverRateStability
+  parameters:
+    lookback: 10
+  universe: ZZ9999
+turnover_rate_stability_21_ZZ9999:
+  classname: Liquidity.TurnoverRateStability
+  parameters:
+    lookback: 21
+  universe: ZZ9999
+turnover_rate_stability_3_ZZ9999:
+  classname: Liquidity.TurnoverRateStability
+  parameters:
+    lookback: 3
+  universe: ZZ9999
+turnover_rate_stability_5_ZZ9999:
+  classname: Liquidity.TurnoverRateStability
+  parameters:
+    lookback: 5
+  universe: ZZ9999
+turnover_rate_stability_63_ZZ9999:
+  classname: Liquidity.TurnoverRateStability
+  parameters:
+    lookback: 63
+  universe: ZZ9999
+turnover_rate_stability_1_ZZ9999:
+  classname: Liquidity.TurnoverRateStability
+  parameters:
+    lookback: 1
+  universe: ZZ9999
+turnover_rate_stability_126_ZZ9999:
+  classname: Liquidity.TurnoverRateStability
+  parameters:
+    lookback: 126
+  universe: ZZ9999
+turnover_rate_stability_252_ZZ9999:
+  classname: Liquidity.TurnoverRateStability
+  parameters:
+    lookback: 252
+  universe: ZZ9999
