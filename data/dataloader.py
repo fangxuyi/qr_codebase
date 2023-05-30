@@ -124,7 +124,7 @@ class DataLoader:
             market_cap = self.referenceDataLoader.load_reference_data("MarketValue")
             self.market_cap = market_cap
         for curdate in window_list:
-            output.append(self.market_cap[self.market_cap["date_int"] == int(curdate)]["code", "date", "mkt_val", "neg_shares"])
+            output.append(self.market_cap[self.market_cap["date_int"] == int(curdate)][["code", "date", "mkt_val", "neg_shares"]])
         output = pd.concat(output, axis=0)
         return output
 

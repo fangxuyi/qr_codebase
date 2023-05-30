@@ -35,7 +35,7 @@ class Liquidity:
             DataProcessor.write_alpha_data(str(date), weight, self.alpha_name)
 
         except:
-            print(f"skipping calc for {self.alpha_name} with lookback {self.parameter['lookback']}")
+            print(f"skipping calc for {self.alpha_name} with lookback {self.parameter['lookback']} on {date}")
             pass
 
 
@@ -68,7 +68,7 @@ class LiquidityStability:
             DataProcessor.write_alpha_data(str(date), weight, self.alpha_name)
 
         except:
-            print(f"skipping calc for {self.alpha_name} with lookback {self.parameter['lookback']}")
+            print(f"skipping calc for {self.alpha_name} with lookback {self.parameter['lookback']} on {date}")
             pass
 
 
@@ -91,7 +91,7 @@ class NormalizedLiquidity:
             returns = returns.pivot_table(index="date", columns="code", values="daily_turover")
             returns = returns.reindex(universe, axis=1).dropna(how="any", axis=1)
 
-            total_return = (returns.last() - returns.mean()) / returns.std()
+            total_return = (returns.tail(1).mean() - returns.mean()) / returns.std()
             total_return_avg = total_return.mean()
             total_return_sum = total_return.apply(lambda x: abs(x)).sum() / 2
             weight = (total_return - total_return_avg) / total_return_sum
@@ -101,7 +101,7 @@ class NormalizedLiquidity:
             DataProcessor.write_alpha_data(str(date), weight, self.alpha_name)
 
         except:
-            print(f"skipping calc for {self.alpha_name} with lookback {self.parameter['lookback']}")
+            print(f"skipping calc for {self.alpha_name} with lookback {self.parameter['lookback']} on {date}")
             pass
 
 
@@ -125,7 +125,7 @@ class TurnoverRate:
             volume = volume.reindex(universe, axis=1).dropna(how="any", axis=1)
 
             neg_shares = self.data_loader.get_market_cap(trade_dates[idx - self.parameter["lookback"]:idx + 1])
-            neg_shares["code"] = neg_shares["code"].apply(lambda x: x.decode('utf-8'))
+            neg_shares["date"] = neg_shares["date"].astype(str)
             neg_shares = neg_shares.pivot_table(index="date", columns="code", values="neg_shares")
 
             total_return = (volume / neg_shares).mean()
@@ -138,7 +138,7 @@ class TurnoverRate:
             DataProcessor.write_alpha_data(str(date), weight, self.alpha_name)
 
         except:
-            print(f"skipping calc for {self.alpha_name} with lookback {self.parameter['lookback']}")
+            print(f"skipping calc for {self.alpha_name} with lookback {self.parameter['lookback']} on {date}")
             pass
 
 
@@ -162,7 +162,7 @@ class TurnoverRateStability:
             volume = volume.reindex(universe, axis=1).dropna(how="any", axis=1)
 
             neg_shares = self.data_loader.get_market_cap(trade_dates[idx - self.parameter["lookback"]:idx + 1])
-            neg_shares["code"] = neg_shares["code"].apply(lambda x: x.decode('utf-8'))
+            neg_shares["date"] = neg_shares["date"].astype(str)
             neg_shares = neg_shares.pivot_table(index="date", columns="code", values="neg_shares")
 
             total_return = (volume / neg_shares).std()
@@ -175,7 +175,7 @@ class TurnoverRateStability:
             DataProcessor.write_alpha_data(str(date), weight, self.alpha_name)
 
         except:
-            print(f"skipping calc for {self.alpha_name} with lookback {self.parameter['lookback']}")
+            print(f"skipping calc for {self.alpha_name} with lookback {self.parameter['lookback']} on {date}")
             pass
 
 
@@ -199,11 +199,11 @@ class TurnoverRateNormalized:
             volume = volume.reindex(universe, axis=1).dropna(how="any", axis=1)
 
             neg_shares = self.data_loader.get_market_cap(trade_dates[idx - self.parameter["lookback"]:idx + 1])
-            neg_shares["code"] = neg_shares["code"].apply(lambda x: x.decode('utf-8'))
+            neg_shares["date"] = neg_shares["date"].astype(str)
             neg_shares = neg_shares.pivot_table(index="date", columns="code", values="neg_shares")
             turnover_rate = (volume / neg_shares)
 
-            total_return = (turnover_rate.last() - turnover_rate.mean() )/ turnover_rate.std()
+            total_return = (turnover_rate.tail(1).mean() - turnover_rate.mean() )/ turnover_rate.std()
             total_return_avg = total_return.mean()
             total_return_sum = total_return.apply(lambda x: abs(x)).sum() / 2
             weight = (total_return - total_return_avg) / total_return_sum
@@ -213,7 +213,7 @@ class TurnoverRateNormalized:
             DataProcessor.write_alpha_data(str(date), weight, self.alpha_name)
 
         except:
-            print(f"skipping calc for {self.alpha_name} with lookback {self.parameter['lookback']}")
+            print(f"skipping calc for {self.alpha_name} with lookback {self.parameter['lookback']} on {date}")
             pass
 
 
@@ -238,7 +238,7 @@ class TurnoverRateChange:
             turnover = turnover.applymap(lambda x: np.log(x))
 
             mkt_val = self.data_loader.get_market_cap(trade_dates[idx - self.parameter["lookback"]:idx + 1])
-            mkt_val["code"] = mkt_val["code"].apply(lambda x: x.decode('utf-8'))
+            mkt_val["date"] = mkt_val["date"].astype(str)
             mkt_val = mkt_val.pivot_table(index="date", columns="code", values="mkt_val")
             mkt_val = mkt_val.applymap(lambda x: np.log(x))
 
@@ -266,7 +266,7 @@ class TurnoverRateChange:
             DataProcessor.write_alpha_data(str(date), weight, self.alpha_name)
 
         except:
-            print(f"skipping calc for {self.alpha_name} with lookback {self.parameter['lookback']}")
+            print(f"skipping calc for {self.alpha_name} with lookback {self.parameter['lookback']} on {date}")
             pass
 
 
@@ -304,5 +304,5 @@ class TurnoverReturns:
             DataProcessor.write_alpha_data(str(date), weight, self.alpha_name)
 
         except:
-            print(f"skipping calc for {self.alpha_name} with lookback {self.parameter['lookback']}")
+            print(f"skipping calc for {self.alpha_name} with lookback {self.parameter['lookback']} on {date}")
             pass
