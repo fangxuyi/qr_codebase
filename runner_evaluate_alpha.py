@@ -11,22 +11,22 @@ def merge(dict_list):
         output.extend(list(dict_item.keys()))
     return output
 
-config_file_names = [
-                     r"\daily\liquidity_mean.yaml",
-                     r"\daily\liquidity_normalized.yaml",
-                     r"\daily\liquidity_std.yaml",
-                     r"\daily\liquidity_turnover_rate.yaml",
-                     r"\daily\liquidity_turnover_rate_change.yaml",
-                     r"\daily\liquidity_turnover_rate_normalized.yaml",
-                     r"\daily\liquidity_turnover_rate_stability.yaml",
-                     r"\daily\turnover_returns.yaml",
-                     r"\intraday\turnover_change_abs.yaml",
-                     r"\intraday\turnover_change_down.yaml",
-                     r"\intraday\turnover_change_up.yaml",
-                     ]
+# config_file_names = [
+#                      r"\daily\liquidity_mean.yaml",
+#                      r"\daily\liquidity_normalized.yaml",
+#                      r"\daily\liquidity_std.yaml",
+#                      r"\daily\liquidity_turnover_rate.yaml",
+#                      r"\daily\liquidity_turnover_rate_change.yaml",
+#                      r"\daily\liquidity_turnover_rate_normalized.yaml",
+#                      r"\daily\liquidity_turnover_rate_stability.yaml",
+#                      # r"\daily\turnover_returns.yaml",
+#                      r"\intraday\turnover_change_abs.yaml",
+#                      r"\intraday\turnover_change_down.yaml",
+#                      r"\intraday\turnover_change_up.yaml",
+#                      ]
 
-# import glob
-# config_file_names = [ele.replace(ConfigPath, "") for ele in glob.glob(ConfigPath+r"\*\*.yaml")]
+import glob
+config_file_names = [ele.replace(ConfigPath, "") for ele in glob.glob(ConfigPath+r"\*\*.yaml")]
 
 alpha_perfmc_cfg_list = merge([load_config_yaml(config) for config in config_file_names])
 

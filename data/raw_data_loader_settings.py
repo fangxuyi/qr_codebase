@@ -109,9 +109,9 @@ def daily_return_driven_by_turnover(pv_data):
     pv_data["return_down"] = (pv_data["close"] / pv_data["open"] - 1).apply(lambda x: x if x < 0 else np.nan)
 
     pv_data["turover"] = pv_data["turover"]
-    pv_data["abs_return_turnover"] = pv_data["return"] / pv_data["turover"]
-    pv_data["up_return_turnover"] = pv_data["return_up"] / pv_data["turover"]
-    pv_data["down_return_turnover"] = pv_data["return_down"] / pv_data["turover"]
+    pv_data["abs_return_turnover"] = pv_data["return"] * 10 ** (10) / pv_data["turover"]
+    pv_data["up_return_turnover"] = pv_data["return_up"] * 10 ** (10) / pv_data["turover"]
+    pv_data["down_return_turnover"] = pv_data["return_down"] * 10 ** (10) / pv_data["turover"]
 
     pv_data = pv_data.groupby("code").agg({
         "abs_return_turnover": "mean",

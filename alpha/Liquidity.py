@@ -201,7 +201,7 @@ class TurnoverRateNormalizedAbs:
             total_return = (turnover_rate.tail(1).mean() - turnover_rate.mean() )/ turnover_rate.std()
             total_return_avg = total_return.mean()
             total_return_sum = total_return.apply(lambda x: abs(x)).sum() / 2
-            weight = - (total_return - total_return_avg) / total_return_sum
+            weight = (total_return - total_return_avg) / total_return_sum
             weight = pd.DataFrame(weight.rename("weight"))
             weight["date"] = date
             weight = weight.reset_index()
@@ -234,7 +234,7 @@ class TurnoverRateNormalizedUp:
             total_return = (turnover_rate.tail(1).mean() - turnover_rate.mean() )/ turnover_rate.std()
             total_return_avg = total_return.mean()
             total_return_sum = total_return.apply(lambda x: abs(x)).sum() / 2
-            weight = - (total_return - total_return_avg) / total_return_sum
+            weight = (total_return - total_return_avg) / total_return_sum
             weight = pd.DataFrame(weight.rename("weight"))
             weight["date"] = date
             weight = weight.reset_index()
