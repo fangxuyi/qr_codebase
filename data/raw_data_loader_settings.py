@@ -47,6 +47,52 @@ def standard_pv_data_processor(pv_data):
     })
 
 
+def intraday_liquidity_data_processor(pv_data):
+    """pv_1min_liquidity"""
+
+    pv_data = pv_data.sort_values("time")
+
+    pv_data["open_time"] = pv_data["time"]
+    pv_data["close_time"] = pv_data["time"]
+    pv_data["prev_close"] = pv_data["pre_close"]
+    pv_data["open"] = pv_data["open"]
+    pv_data["high"] = pv_data["high"]
+    pv_data["low"] = pv_data["low"]
+    pv_data["close"] = pv_data["close"]
+    pv_data["open_volume"] = pv_data["volume"]
+    pv_data["close_volume"] = pv_data["volume"]
+    pv_data["max_volume"] = pv_data["volume"]
+    pv_data["up_volume"] = pv_data["volume"]
+    pv_data["down_volume"] = pv_data["volume"]
+    pv_data["min_volume"] = pv_data["volume"].replace(0., np.nan)
+    pv_data["minute_return"] = pv_data["close"] / pv_data["open"] - 1
+
+    minute_return_mask_up = pv_data["minute_return"].apply(lambda x: x > 0).values
+    minute_return_mask_down = pv_data["minute_return"].apply(lambda x: x < 0).values
+    pv_data.loc[minute_return_mask_down, "up_volume"] = 0
+    pv_data.loc[minute_return_mask_up, "down_volume"] = 0
+
+    pv_data["turnover_high_low"] = (pv_data["high"] - pv_data["low"]) / pv_data["turover"]
+    pv_data["turnover_high_open"] = (pv_data["high"] - pv_data["open"]) / pv_data["turover"]
+
+    return pv_data.groupby("code").agg({
+        "open_time": min,
+        "close_time": max,
+        "prev_close": "first",
+        "open": "first",
+        "high": max,
+        "low": min,
+        "close": "last",
+        "open_volume": "first",
+        "close_volume": "last",
+        "max_volume": max,
+        "min_volume": min,
+        "up_volume": sum,
+        "down_volume": sum,
+        "turnover_high_low": "mean",
+        "turnover_high_open": "mean",
+    })
+
 def intraday_volatility(pv_data):
     """pv_1min_intraday_volatility"""
 

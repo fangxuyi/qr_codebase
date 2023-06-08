@@ -16,8 +16,8 @@ if __name__ == '__main__':
     data_loader = DataLoader()
     dates = data_loader.get_trade_date_between(calc_start, calc_end)
 
-    names = ["pv_1min_daily_turnover"]
-    data_processors = [daily_return_driven_by_turnover]
+    names = ["pv_1min_liquidity"]
+    data_processors = [intraday_liquidity_data_processor]
     data_processor = DataProcessor("multi", ReferenceDataLoader, RawDataLoader)
 
     args_list = []

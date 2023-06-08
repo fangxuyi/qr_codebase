@@ -410,3 +410,251 @@ class TurnoverReturns:
         except:
             print(f"skipping calc for {self.alpha_name} with lookback {self.parameter['lookback']} on {date}")
             pass
+
+
+class OpenToCloseVolumeRatio:
+
+    def __init__(self, alpha_name, universe, parameter):
+        self.alpha_name = alpha_name
+        self.universe = universe
+        self.parameter = parameter
+        self.data_loader = DataLoader()
+
+    def calculate(self, date):
+        trade_dates = self.data_loader.get_all_trade_dates()
+        universe = self.data_loader.get_current_universe(date, self.universe)["code"].to_list()
+        try:
+            idx = trade_dates.index(date)
+            pv_1min_return = self.data_loader.load_processed_window_list("pv_1min_liquidity",
+                                                                  trade_dates[idx - self.parameter["lookback"]:idx + 1])
+            pv_1min_return["code"] = pv_1min_return["code"].apply(lambda x: x.decode('utf-8'))
+            open = pv_1min_return.pivot_table(index="date", columns="code", values="open_volume")
+            open = open.reindex(universe, axis=1).dropna(how="any", axis=1)
+            close = pv_1min_return.pivot_table(index="date", columns="code", values="close_volume")
+            close = close.reindex(universe, axis=1).dropna(how="any", axis=1)
+
+            returns_turnover = (close / open - 1).rank(axis=0)
+
+            total_return = returns_turnover.rank(axis=1).tail(1).mean()
+            total_return_avg = total_return.mean()
+            total_return_sum = total_return.apply(lambda x: abs(x)).sum() / 2
+            weight = - (total_return - total_return_avg) / total_return_sum
+            weight = pd.DataFrame(weight.rename("weight"))
+            weight["date"] = date
+            weight = weight.reset_index()
+            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name)
+
+        except:
+            print(f"skipping calc for {self.alpha_name} with lookback {self.parameter['lookback']} on {date}")
+            pass
+
+class Volume:
+
+    def __init__(self, alpha_name, universe, parameter):
+        self.alpha_name = alpha_name
+        self.universe = universe
+        self.parameter = parameter
+        self.data_loader = DataLoader()
+
+    def calculate(self, date):
+        trade_dates = self.data_loader.get_all_trade_dates()
+        universe = self.data_loader.get_current_universe(date, self.universe)["code"].to_list()
+        try:
+            idx = trade_dates.index(date)
+            pv_1min_return = self.data_loader.load_processed_window_list("pv_1min_liquidity",
+                                                                         trade_dates[idx - self.parameter[
+                                                                             "lookback"]:idx + 1])
+            pv_1min_return["code"] = pv_1min_return["code"].apply(lambda x: x.decode('utf-8'))
+            up_volume = pv_1min_return.pivot_table(index="date", columns="code", values="up_volume")
+            up_volume = up_volume.reindex(universe, axis=1).dropna(how="any", axis=1)
+            down_volume = pv_1min_return.pivot_table(index="date", columns="code", values="down_volume")
+            down_volume = down_volume.reindex(universe, axis=1).dropna(how="any", axis=1)
+
+            total_return = (up_volume + down_volume).mean()
+            total_return_avg = total_return.mean()
+            total_return_sum = total_return.apply(lambda x: abs(x)).sum() / 2
+            weight = - (total_return - total_return_avg) / total_return_sum
+            weight = pd.DataFrame(weight.rename("weight"))
+            weight["date"] = date
+            weight = weight.reset_index()
+            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name)
+
+        except:
+            print(
+                f"skipping calc for {self.alpha_name} with lookback {self.parameter['lookback']} on {date}")
+            pass
+
+class UpVolume:
+
+    def __init__(self, alpha_name, universe, parameter):
+        self.alpha_name = alpha_name
+        self.universe = universe
+        self.parameter = parameter
+        self.data_loader = DataLoader()
+
+    def calculate(self, date):
+        trade_dates = self.data_loader.get_all_trade_dates()
+        universe = self.data_loader.get_current_universe(date, self.universe)["code"].to_list()
+        try:
+            idx = trade_dates.index(date)
+            pv_1min_return = self.data_loader.load_processed_window_list("pv_1min_liquidity",
+                                                                         trade_dates[idx - self.parameter[
+                                                                             "lookback"]:idx + 1])
+            pv_1min_return["code"] = pv_1min_return["code"].apply(lambda x: x.decode('utf-8'))
+            up_volume = pv_1min_return.pivot_table(index="date", columns="code", values="up_volume")
+            up_volume = up_volume.reindex(universe, axis=1).dropna(how="any", axis=1)
+
+            total_return = up_volume.mean()
+            total_return_avg = total_return.mean()
+            total_return_sum = total_return.apply(lambda x: abs(x)).sum() / 2
+            weight = - (total_return - total_return_avg) / total_return_sum
+            weight = pd.DataFrame(weight.rename("weight"))
+            weight["date"] = date
+            weight = weight.reset_index()
+            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name)
+
+        except:
+            print(
+                f"skipping calc for {self.alpha_name} with lookback {self.parameter['lookback']} on {date}")
+            pass
+
+
+class DownVolume:
+
+    def __init__(self, alpha_name, universe, parameter):
+        self.alpha_name = alpha_name
+        self.universe = universe
+        self.parameter = parameter
+        self.data_loader = DataLoader()
+
+    def calculate(self, date):
+        trade_dates = self.data_loader.get_all_trade_dates()
+        universe = self.data_loader.get_current_universe(date, self.universe)["code"].to_list()
+        try:
+            idx = trade_dates.index(date)
+            pv_1min_return = self.data_loader.load_processed_window_list("pv_1min_liquidity",
+                                                                         trade_dates[idx - self.parameter[
+                                                                             "lookback"]:idx + 1])
+            pv_1min_return["code"] = pv_1min_return["code"].apply(lambda x: x.decode('utf-8'))
+            down_volume = pv_1min_return.pivot_table(index="date", columns="code", values="down_volume")
+            down_volume = down_volume.reindex(universe, axis=1).dropna(how="any", axis=1)
+
+            total_return = down_volume.mean()
+            total_return_avg = total_return.mean()
+            total_return_sum = total_return.apply(lambda x: abs(x)).sum() / 2
+            weight = - (total_return - total_return_avg) / total_return_sum
+            weight = pd.DataFrame(weight.rename("weight"))
+            weight["date"] = date
+            weight = weight.reset_index()
+            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name)
+
+        except:
+            print(
+                f"skipping calc for {self.alpha_name} with lookback {self.parameter['lookback']} on {date}")
+            pass
+
+
+class UpDownVolumeRatio:
+
+    def __init__(self, alpha_name, universe, parameter):
+        self.alpha_name = alpha_name
+        self.universe = universe
+        self.parameter = parameter
+        self.data_loader = DataLoader()
+
+    def calculate(self, date):
+        trade_dates = self.data_loader.get_all_trade_dates()
+        universe = self.data_loader.get_current_universe(date, self.universe)["code"].to_list()
+        try:
+            idx = trade_dates.index(date)
+            pv_1min_return = self.data_loader.load_processed_window_list("pv_1min_liquidity",
+                                                                         trade_dates[idx - self.parameter[
+                                                                             "lookback"]:idx + 1])
+            pv_1min_return["code"] = pv_1min_return["code"].apply(lambda x: x.decode('utf-8'))
+            pv_1min_return["updownvolumeratio"] = pv_1min_return["up_volume"] / pv_1min_return["down_volume"] - 1
+            updown_volume_ratio = pv_1min_return.pivot_table(index="date", columns="code", values="updownvolumeratio")
+            updown_volume_ratio = updown_volume_ratio.reindex(universe, axis=1).dropna(how="any", axis=1)
+
+            total_return = updown_volume_ratio.mean()
+            total_return_avg = total_return.mean()
+            total_return_sum = total_return.apply(lambda x: abs(x)).sum() / 2
+            weight = - (total_return - total_return_avg) / total_return_sum
+            weight = pd.DataFrame(weight.rename("weight"))
+            weight["date"] = date
+            weight = weight.reset_index()
+            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name)
+
+        except:
+            print(
+                f"skipping calc for {self.alpha_name} with lookback {self.parameter['lookback']} on {date}")
+            pass
+
+
+class HighLowTurnover:
+
+    def __init__(self, alpha_name, universe, parameter):
+        self.alpha_name = alpha_name
+        self.universe = universe
+        self.parameter = parameter
+        self.data_loader = DataLoader()
+
+    def calculate(self, date):
+        trade_dates = self.data_loader.get_all_trade_dates()
+        universe = self.data_loader.get_current_universe(date, self.universe)["code"].to_list()
+        try:
+            idx = trade_dates.index(date)
+            pv_1min_return = self.data_loader.load_processed_window_list("pv_1min_liquidity",
+                                                                         trade_dates[idx - self.parameter[
+                                                                             "lookback"]:idx + 1])
+            pv_1min_return["code"] = pv_1min_return["code"].apply(lambda x: x.decode('utf-8'))
+            turnover_high_low = pv_1min_return.pivot_table(index="date", columns="code", values="turnover_high_low")
+            turnover_high_low = turnover_high_low.reindex(universe, axis=1).dropna(how="any", axis=1)
+
+            total_return = turnover_high_low.mean()
+            total_return_avg = total_return.mean()
+            total_return_sum = total_return.apply(lambda x: abs(x)).sum() / 2
+            weight = - (total_return - total_return_avg) / total_return_sum
+            weight = pd.DataFrame(weight.rename("weight"))
+            weight["date"] = date
+            weight = weight.reset_index()
+            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name)
+
+        except:
+            print(
+                f"skipping calc for {self.alpha_name} with lookback {self.parameter['lookback']} on {date}")
+            pass
+
+
+class HighOpenTurnover:
+
+    def __init__(self, alpha_name, universe, parameter):
+        self.alpha_name = alpha_name
+        self.universe = universe
+        self.parameter = parameter
+        self.data_loader = DataLoader()
+
+    def calculate(self, date):
+        trade_dates = self.data_loader.get_all_trade_dates()
+        universe = self.data_loader.get_current_universe(date, self.universe)["code"].to_list()
+        try:
+            idx = trade_dates.index(date)
+            pv_1min_return = self.data_loader.load_processed_window_list("pv_1min_liquidity",
+                                                                         trade_dates[idx - self.parameter[
+                                                                             "lookback"]:idx + 1])
+            pv_1min_return["code"] = pv_1min_return["code"].apply(lambda x: x.decode('utf-8'))
+            turnover_high_open = pv_1min_return.pivot_table(index="date", columns="code", values="turnover_high_open")
+            turnover_high_open = turnover_high_open.reindex(universe, axis=1).dropna(how="any", axis=1)
+
+            total_return = turnover_high_open.mean()
+            total_return_avg = total_return.mean()
+            total_return_sum = total_return.apply(lambda x: abs(x)).sum() / 2
+            weight = - (total_return - total_return_avg) / total_return_sum
+            weight = pd.DataFrame(weight.rename("weight"))
+            weight["date"] = date
+            weight = weight.reset_index()
+            DataProcessor.write_alpha_data(str(date), weight, self.alpha_name)
+
+        except:
+            print(
+                f"skipping calc for {self.alpha_name} with lookback {self.parameter['lookback']} on {date}")
+            pass

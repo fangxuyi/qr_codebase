@@ -12,17 +12,13 @@ def merge(dict_list):
 
 
 config_file_names = [
-                     # r"\daily\liquidity_mean.yaml",
-                     # r"\daily\liquidity_normalized.yaml",
-                     # r"\daily\liquidity_std.yaml",
-                     # r"\daily\liquidity_turnover_rate.yaml",
-                     # r"\daily\liquidity_turnover_rate_change.yaml",
-                     # r"\daily\liquidity_turnover_rate_normalized.yaml",
-                     # r"\daily\liquidity_turnover_rate_stability.yaml",
-                     # r"\daily\turnover_returns.yaml",
-                     r"\intraday\turnover_change_abs.yaml",
-                     r"\intraday\turnover_change_down.yaml",
-                     r"\intraday\turnover_change_up.yaml",
+                     # r"\intraday\down_volume.yaml",
+                     # r"\intraday\high_low_turnover.yaml",
+                     # r"\intraday\high_open_turnover.yaml",
+                     # r"\intraday\open_close_volume_ratio.yaml",
+                     # r"\intraday\up_down_volume_ratio.yaml",
+                     # r"\intraday\up_volume.yaml",
+                     r"\intraday\volume.yaml",
                      ]
 
 if __name__ == '__main__':

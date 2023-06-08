@@ -1,0 +1,40 @@
+open_close_volume_ratio_10_ZZ9999:
+  classname: Liquidity.OpenToCloseVolumeRatio
+  parameters:
+    lookback: 10
+  universe: ZZ9999
+open_close_volume_ratio_21_ZZ9999:
+  classname: Liquidity.OpenToCloseVolumeRatio
+  parameters:
+    lookback: 21
+  universe: ZZ9999
+open_close_volume_ratio_5_ZZ9999:
+  classname: Liquidity.OpenToCloseVolumeRatio
+  parameters:
+    lookback: 5
+  universe: ZZ9999
+open_close_volume_ratio_63_ZZ9999:
+  classname: Liquidity.OpenToCloseVolumeRatio
+  parameters:
+    lookback: 63
+  universe: ZZ9999
+open_close_volume_ratio_1_ZZ9999:
+  classname: Liquidity.OpenToCloseVolumeRatio
+  parameters:
+    lookback: 1
+  universe: ZZ9999
+open_close_volume_ratio_2_ZZ9999:
+  classname: Liquidity.OpenToCloseVolumeRatio
+  parameters:
+    lookback: 2
+  universe: ZZ9999
+open_close_volume_ratio_3_ZZ9999:
+  classname: Liquidity.OpenToCloseVolumeRatio
+  parameters:
+    lookback: 3
+  universe: ZZ9999
+open_close_volume_ratio_126_ZZ9999:
+  classname: Liquidity.OpenToCloseVolumeRatio
+  parameters:
+    lookback: 126
+  universe: ZZ9999

@@ -1,0 +1,40 @@
+high_low_turnover_10_ZZ9999:
+  classname: Liquidity.HighLowTurnover
+  parameters:
+    lookback: 10
+  universe: ZZ9999
+high_low_turnover_21_ZZ9999:
+  classname: Liquidity.HighLowTurnover
+  parameters:
+    lookback: 21
+  universe: ZZ9999
+high_low_turnover_5_ZZ9999:
+  classname: Liquidity.HighLowTurnover
+  parameters:
+    lookback: 5
+  universe: ZZ9999
+high_low_turnover_63_ZZ9999:
+  classname: Liquidity.HighLowTurnover
+  parameters:
+    lookback: 63
+  universe: ZZ9999
+high_low_turnover_1_ZZ9999:
+  classname: Liquidity.HighLowTurnover
+  parameters:
+    lookback: 1
+  universe: ZZ9999
+high_low_turnover_2_ZZ9999:
+  classname: Liquidity.HighLowTurnover
+  parameters:
+    lookback: 2
+  universe: ZZ9999
+high_low_turnover_3_ZZ9999:
+  classname: Liquidity.HighLowTurnover
+  parameters:
+    lookback: 3
+  universe: ZZ9999
+high_low_turnover_126_ZZ9999:
+  classname: Liquidity.HighLowTurnover
+  parameters:
+    lookback: 126
+  universe: ZZ9999
