@@ -17,32 +17,42 @@ class PerformanceEvaluatingUtils:
         merged_alpha = merged_alpha.pivot_table(index="date", columns="code", values="weight").ffill()
         return merged_alpha.stack()
 
-    def get_delay_n_alpha(self, alpha, n):
+    def adjust_limit(self, alpha, limit):
+
+        limit_stack = limit.stack().rename("limit").reset_index()
+        merged_alpha = pd.merge(alpha, limit_stack, left_on=["code", "date"], right_on=["code", "date"], how="left")
+        merged_alpha = merged_alpha.fillna(0)
+        merged_alpha.loc[merged_alpha["limit"], "weight"] = np.nan
+        merged_alpha = merged_alpha.pivot_table(index="date", columns="code", values="weight").ffill()
+        return merged_alpha.stack()
+
+    def get_delay_n_alpha(self, alpha, n, limit):
 
         alpha = alpha.pivot_table(index="date", columns="code", values="weight").shift(n).stack().rename("weight").reset_index()
         halt_adj_alpha = self.adjust_halt(alpha).rename("weight").reset_index()
-        delay_n_alpha = halt_adj_alpha.pivot_table(index="date", columns="code", values="weight").shift(1)
+        limit_adj_alpha = self.adjust_limit(halt_adj_alpha, limit).rename("weight").reset_index()
+        delay_n_alpha = limit_adj_alpha.pivot_table(index="date", columns="code", values="weight").shift(1)
         delay_n_alpha = delay_n_alpha.stack().rename("weight").reset_index()
         return delay_n_alpha
 
-    def calculate_delay_n_alpha_returns(self, alpha, returns, n):
+    def calculate_delay_n_alpha_returns(self, alpha, returns, n, limit):
 
-        delayed_alpha = self.get_delay_n_alpha(alpha, n)
+        delayed_alpha = self.get_delay_n_alpha(alpha, n, limit)
         merged_return = pd.merge(delayed_alpha, returns, left_on=["code", "date"], right_on=["code", "date"],
                                  how="left")
         merged_return["contributed_return"] = merged_return["return"] * merged_return["weight"]
         return merged_return
 
-    def calculate_all_delayed_returns(self, alpha, returns):
+    def calculate_all_delayed_returns(self, alpha, returns, limit):
 
-        delayed_alpha = self.get_delay_n_alpha(alpha, 1)
+        delayed_alpha = self.get_delay_n_alpha(alpha, 1, limit)
         delay_1_returns = pd.merge(delayed_alpha, returns, left_on=["code", "date"], right_on=["code", "date"],
                                  how="left")
         delay_1_returns["contributed_return"] = delay_1_returns["return"] * delay_1_returns["weight"]
 
         output = []
         for ele in self.delayed_return_config:
-            delayed_alpha = self.get_delay_n_alpha(alpha, ele)
+            delayed_alpha = self.get_delay_n_alpha(alpha, ele, limit)
             merged_return = pd.merge(delayed_alpha, returns, left_on=["code", "date"], right_on=["code", "date"],
                                      how="left")
             merged_return["contributed_return"] = merged_return["return"] * merged_return["weight"]
