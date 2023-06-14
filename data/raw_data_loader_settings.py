@@ -47,6 +47,59 @@ def standard_pv_data_processor(pv_data):
     })
 
 
+def money_flow_processor(pv_data):
+    """pv_1min_moneyflow_standard"""
+
+    pv_data = pv_data.sort_values("time")
+
+    pv_data["open_time"] = pv_data["time"]
+    pv_data["close_time"] = pv_data["time"]
+    pv_data["prev_close"] = pv_data["pre_close"]
+    pv_data["open"] = pv_data["open"]
+    pv_data["high"] = pv_data["high"]
+    pv_data["low"] = pv_data["low"]
+    pv_data["close"] = pv_data["close"]
+    pv_data["avg_turover"] = pv_data["turover"] / pv_data["dif_mi"]
+    pv_data["direction"] = (pv_data["close"] / pv_data["open"] - 1).apply(np.sign)
+
+    pv_data["ultra_large_in"] = pv_data["turover"]
+    pv_data.loc[(pv_data["avg_turover"] <= 50000) | (pv_data["direction"] < 0), "ultra_large_in"] = np.nan
+
+    pv_data["ultra_large_out"] = pv_data["turover"]
+    pv_data.loc[(pv_data["avg_turover"] <= 50000) | (pv_data["direction"] > 0), "ultra_large_out"] = np.nan
+
+    pv_data["large_in"] = pv_data["turover"]
+    pv_data.loc[(pv_data["avg_turover"] <= 45000) | (pv_data["avg_turover"] > 50000) | (pv_data["direction"] < 0), "large_in"] = np.nan
+
+    pv_data["large_out"] = pv_data["turover"]
+    pv_data.loc[(pv_data["avg_turover"] <= 45000) | (pv_data["avg_turover"] > 50000) | (pv_data["direction"] > 0), "large_out"] = np.nan
+
+    pv_data["medium_in"] = pv_data["turover"]
+    pv_data.loc[(pv_data["avg_turover"] <= 40000) | (pv_data["avg_turover"] > 45000) | (pv_data["direction"] < 0), "medium_in"] = np.nan
+
+    pv_data["medium_out"] = pv_data["turover"]
+    pv_data.loc[(pv_data["avg_turover"] <= 40000) | (pv_data["avg_turover"] > 45000) | (pv_data["direction"] > 0), "medium_out"] = np.nan
+
+    pv_data["small_in"] = pv_data["turover"]
+    pv_data.loc[(pv_data["avg_turover"] > 40000) | (pv_data["direction"] < 0), "small_in"] = np.nan
+
+    pv_data["small_out"] = pv_data["turover"]
+    pv_data.loc[(pv_data["avg_turover"] > 40000) | (pv_data["direction"] > 0), "small_out"] = np.nan
+
+    pv_data = pv_data[["code", "ultra_large_in", "ultra_large_out", "large_in", "large_out", "medium_in", "medium_out", "small_in", "small_out"]].fillna(0)
+
+    return pv_data.groupby("code").agg({
+        "ultra_large_in": sum,
+        "ultra_large_out": sum,
+        "large_in": sum,
+        "large_out": sum,
+        "medium_in": sum,
+        "medium_out": sum,
+        "small_in": sum,
+        "small_out": sum,
+    })
+
+
 def intraday_liquidity_data_processor(pv_data):
     """pv_1min_liquidity"""
 

@@ -16,8 +16,8 @@ if __name__ == '__main__':
     data_loader = DataLoader()
     dates = data_loader.get_trade_date_between(calc_start, calc_end)
 
-    names = ["pv_1min_liquidity"]
-    data_processors = [intraday_liquidity_data_processor]
+    names = ["pv_1min_moneyflow_standard"]
+    data_processors = [money_flow_processor]
     data_processor = DataProcessor("multi", ReferenceDataLoader, RawDataLoader)
 
     args_list = []
