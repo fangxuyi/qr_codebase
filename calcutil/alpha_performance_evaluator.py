@@ -19,14 +19,14 @@ class PerformanceEvaluator:
         self.alpha_performance_evaluating_utils = alpha_performance_evaluating_utils
 
     def evaluate(self, alpha_list):
-        # pool = multiprocessing.Pool(pool_size)
-        # all_returns = pool.map(self.evaluate_single_alpha, alpha_list)
-        # print("***** correlation matrix *****")
-        # pd.concat(all_returns, axis=1).corr().to_csv(DataPath + "\\" + "correlation.csv")
-        # pool.close()
-
-        all_returns = [self.evaluate_single_alpha(alpha) for alpha in alpha_list]
+        pool = multiprocessing.Pool(pool_size)
+        all_returns = pool.map(self.evaluate_single_alpha, alpha_list)
+        print("***** correlation matrix *****")
         pd.concat(all_returns, axis=1).corr().to_csv(DataPath + "\\" + "correlation.csv")
+        pool.close()
+
+        # all_returns = [self.evaluate_single_alpha(alpha) for alpha in alpha_list]
+        # pd.concat(all_returns, axis=1).corr().to_csv(DataPath + "\\" + "correlation.csv")
 
     def evaluate_single_alpha(self, alpha_name):
         try:
