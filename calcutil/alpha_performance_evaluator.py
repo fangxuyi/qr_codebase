@@ -60,9 +60,13 @@ class PerformanceEvaluator:
             reports.html(delay_1_returns["contributed_return"], all_returns, delay_1_weights, delay_1_returns_details,
                          output=True,
                          download_filename=TearSheetOutputPath + f"\\{alpha_name}.html")
+            # reports.html(all_returns["delay 0"], all_returns, delay_1_weights, delay_1_returns_details,
+            #              output=True,
+            #              download_filename=TearSheetOutputPath + f"\\{alpha_name}" + "_delay0.html")
             logger.info(f"calculated performance for {alpha_name} in {time.perf_counter() - t} seconds")
 
             return delay_1_returns["contributed_return"].rename(alpha_name)
+            #return pd.concat([delay_1_returns["contributed_return"].rename(alpha_name), all_returns["delay 0"].rename(alpha_name + "_delay0")], axis=1)
 
         except:
             pass
