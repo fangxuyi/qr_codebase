@@ -1,0 +1,40 @@
+small_order_flow_10_ZZ9999:
+  classname: MoneyFlow.SmallOrderFlow
+  parameters:
+    lookback: 10
+  universe: ZZ9999
+small_order_flow_21_ZZ9999:
+  classname: MoneyFlow.SmallOrderFlow
+  parameters:
+    lookback: 21
+  universe: ZZ9999
+small_order_flow_5_ZZ9999:
+  classname: MoneyFlow.SmallOrderFlow
+  parameters:
+    lookback: 5
+  universe: ZZ9999
+small_order_flow_63_ZZ9999:
+  classname: MoneyFlow.SmallOrderFlow
+  parameters:
+    lookback: 63
+  universe: ZZ9999
+small_order_flow_1_ZZ9999:
+  classname: MoneyFlow.SmallOrderFlow
+  parameters:
+    lookback: 1
+  universe: ZZ9999
+small_order_flow_2_ZZ9999:
+  classname: MoneyFlow.SmallOrderFlow
+  parameters:
+    lookback: 2
+  universe: ZZ9999
+small_order_flow_3_ZZ9999:
+  classname: MoneyFlow.SmallOrderFlow
+  parameters:
+    lookback: 3
+  universe: ZZ9999
+small_order_flow_126_ZZ9999:
+  classname: MoneyFlow.SmallOrderFlow
+  parameters:
+    lookback: 126
+  universe: ZZ9999

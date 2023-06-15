@@ -1,0 +1,40 @@
+large_order_flow_percent_10_ZZ9999:
+  classname: MoneyFlow.LargeOrderFlowPercent
+  parameters:
+    lookback: 10
+  universe: ZZ9999
+large_order_flow_percent_21_ZZ9999:
+  classname: MoneyFlow.LargeOrderFlowPercent
+  parameters:
+    lookback: 21
+  universe: ZZ9999
+large_order_flow_percent_5_ZZ9999:
+  classname: MoneyFlow.LargeOrderFlowPercent
+  parameters:
+    lookback: 5
+  universe: ZZ9999
+large_order_flow_percent_63_ZZ9999:
+  classname: MoneyFlow.LargeOrderFlowPercent
+  parameters:
+    lookback: 63
+  universe: ZZ9999
+large_order_flow_percent_1_ZZ9999:
+  classname: MoneyFlow.LargeOrderFlowPercent
+  parameters:
+    lookback: 1
+  universe: ZZ9999
+large_order_flow_percent_2_ZZ9999:
+  classname: MoneyFlow.LargeOrderFlowPercent
+  parameters:
+    lookback: 2
+  universe: ZZ9999
+large_order_flow_percent_3_ZZ9999:
+  classname: MoneyFlow.LargeOrderFlowPercent
+  parameters:
+    lookback: 3
+  universe: ZZ9999
+large_order_flow_percent_126_ZZ9999:
+  classname: MoneyFlow.LargeOrderFlowPercent
+  parameters:
+    lookback: 126
+  universe: ZZ9999
