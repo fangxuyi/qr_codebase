@@ -1,4 +1,5 @@
-from calcutil.alpha_calc_config import calc_start, calc_end
+import multiprocessing
+from calcutil.alpha_calc_config import pool_size, calc_end
 from data.dataloader import DataLoader
 from data.dataprocessor import DataProcessor
 from data.raw_data_loader_settings import *
@@ -23,8 +24,10 @@ if __name__ == '__main__':
     args_list = []
     for date in dates:
         args_list.append((names, data_processors, date))
-    for arg in args_list:
-        data_processor.process_with_args(arg)
+
+    pool = multiprocessing.Pool(pool_size)
+    pool.map(data_processor.process_with_args, args_list)
+    pool.close()
 
 # TODO: ADD data validator and error handler
 
