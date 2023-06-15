@@ -13,17 +13,17 @@ def merge(dict_list):
 
 config_file_names = [
                        r"\intraday\large_money_flow.yaml",
-                       r"\intraday\large_money_flow_percent.yaml",
-                       r"\intraday\large_money_flow_ratio.yaml",
-                       r"\intraday\medium_money_flow.yaml",
-                       r"\intraday\medium_money_flow_percent.yaml",
-                       r"\intraday\medium_money_flow_ratio.yaml",
-                       r"\intraday\mega_money_flow.yaml",
-                       r"\intraday\mega_money_flow_percent.yaml",
-                       r"\intraday\mega_money_flow_ratio.yaml",
-                       r"\intraday\small_money_flow.yaml",
-                       r"\intraday\small_money_flow_percent.yaml",
-                       r"\intraday\small_money_flow_ratio.yaml",
+                       # r"\intraday\large_money_flow_percent.yaml",
+                       # r"\intraday\large_money_flow_ratio.yaml",
+                       # r"\intraday\medium_money_flow.yaml",
+                       # r"\intraday\medium_money_flow_percent.yaml",
+                       # r"\intraday\medium_money_flow_ratio.yaml",
+                       # r"\intraday\mega_money_flow.yaml",
+                       # r"\intraday\mega_money_flow_percent.yaml",
+                       # r"\intraday\mega_money_flow_ratio.yaml",
+                       # r"\intraday\small_money_flow.yaml",
+                       # r"\intraday\small_money_flow_percent.yaml",
+                       # r"\intraday\small_money_flow_ratio.yaml",
                      ]
 
 # import glob

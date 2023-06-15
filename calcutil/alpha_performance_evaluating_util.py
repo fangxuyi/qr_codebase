@@ -12,18 +12,20 @@ class PerformanceEvaluatingUtils:
 
         halt_dt = self.data_loader.get_halt_date()
         merged_alpha = pd.merge(alpha, halt_dt, left_on=["code", "date"], right_on=["code", "date"], how="left")
-        merged_alpha = merged_alpha.fillna(0)
-        merged_alpha.loc[merged_alpha["is_halt"] == 1, "weight"] = np.nan
-        merged_alpha = merged_alpha.pivot_table(index="date", columns="code", values="weight").ffill()
+        merged_alpha_is_halt = merged_alpha.pivot_table(index="date", columns="code", values="is_halt").fillna(0)
+        merged_alpha_weight = merged_alpha.pivot_table(index="date", columns="code", values="weight").fillna(0)
+        merged_alpha_weight[merged_alpha_is_halt == 1] = np.nan
+        merged_alpha = merged_alpha_weight.ffill()
         return merged_alpha.stack()
 
     def adjust_limit(self, alpha, limit):
 
         limit_stack = limit.stack().rename("limit").reset_index()
         merged_alpha = pd.merge(alpha, limit_stack, left_on=["code", "date"], right_on=["code", "date"], how="left")
-        merged_alpha = merged_alpha.fillna(0)
-        merged_alpha.loc[merged_alpha["limit"], "weight"] = np.nan
-        merged_alpha = merged_alpha.pivot_table(index="date", columns="code", values="weight").ffill()
+        merged_alpha_is_limit = merged_alpha.pivot_table(index="date", columns="code", values="limit").fillna(0)
+        merged_alpha_weight = merged_alpha.pivot_table(index="date", columns="code", values="weight").fillna(0)
+        merged_alpha_weight[merged_alpha_is_limit == 1] = np.nan
+        merged_alpha = merged_alpha_weight.ffill()
         return merged_alpha.stack()
 
     def get_delay_n_alpha(self, alpha, n, limit):
