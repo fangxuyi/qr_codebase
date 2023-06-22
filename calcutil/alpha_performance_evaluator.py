@@ -18,6 +18,24 @@ class PerformanceEvaluator:
     def __init__(self, alpha_performance_evaluating_utils):
         self.alpha_performance_evaluating_utils = alpha_performance_evaluating_utils
 
+    def load(self, alpha_list):
+        pool = multiprocessing.Pool(pool_size)
+        all_weights = pool.map(self.load_single_alpha, alpha_list)
+        pool.close()
+        return pd.concat(all_weights, axis=1)
+
+    def load_single_alpha(self, alpha_name):
+        try:
+            trade_dates = self.alpha_performance_evaluating_utils.data_loader.get_trade_date_between(calc_start,
+                                                                                                     calc_end)
+            alpha = self.alpha_performance_evaluating_utils.data_loader.load_processed_alpha_window_list(alpha_name,
+                                                                                                         trade_dates)
+            alpha["code"] = alpha["code"].apply(lambda x: x.decode('utf-8'))
+
+            return alpha.set_index(["code", "date"])["weight"].rename(alpha_name)
+        except:
+            pass
+
     def evaluate(self, alpha_list):
         pool = multiprocessing.Pool(pool_size)
         all_returns = pool.map(self.evaluate_single_alpha, alpha_list)

@@ -83,6 +83,25 @@ class DataProcessor:
             f.close()
 
     @classmethod
+    def write_alpha_data_all(cls, daily_df, name, org_structure=FileOrgStructure.DATECOLUMN):
+        if org_structure is not FileOrgStructure.DATECOLUMN:
+            raise Exception("Method not implemented")
+
+        all_dates = list(daily_df["date"].drop_duplicates())
+        directory = AlphaOutputPath + "\\" + name
+        if not os.path.exists(directory):
+            os.mkdir(directory)
+        for date in all_dates:
+            data = daily_df[daily_df["date"] == date]
+            with h5py.File(directory + "\\" + str(date) + ".hdf5", 'w') as f:
+                for column in daily_df.columns:
+                    try:
+                        f.create_dataset(column, data=data[column].to_numpy())
+                    except:
+                        f.create_dataset(column, data=data[column].to_numpy().astype(np.float64))
+                f.close()
+
+    @classmethod
     def write_alpha_data(cls, date, daily_df, name, org_structure=FileOrgStructure.DATECOLUMN):
         if org_structure is not FileOrgStructure.DATECOLUMN:
             raise Exception("Method not implemented")
